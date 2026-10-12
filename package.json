@@ -1,0 +1,28 @@
+{
+  "name": "smart-lab-assistant",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c blue,green \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "uv run --directory backend uvicorn app.main:app --reload --host 127.0.0.1 --port 8010",
+    "dev:web": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "start": "uv run --directory backend uvicorn app.main:app --host 127.0.0.1 --port 8010 --workers 1",
+    "db:up": "docker compose up -d db",
+    "db:init": "uv run --directory backend python scripts/db_init.py",
+    "models:check": "uv run --directory backend python scripts/models_check.py",
+    "seed": "uv run --directory backend python scripts/seed.py",
+    "snapshot": "uv run --directory backend python scripts/snapshot.py",
+    "demo:reset": "uv run --directory backend python scripts/demo_reset.py",
+    "demo:verify": "uv run --directory backend python scripts/demo_verify.py",
+    "calibrate": "uv run --directory backend python scripts/calibrate.py",
+    "preflight": "uv run --directory backend python scripts/preflight.py",
+    "test": "uv run --directory backend pytest -q",
+    "test:rbac": "uv run --directory backend pytest tests/test_rbac.py -s -q",
+    "test:inventory": "uv run --directory backend pytest tests/test_inventory.py -s -q",
+    "gen:api": "uv run --directory backend python scripts/export_openapi.py && npm --prefix frontend run gen:api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

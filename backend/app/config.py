@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     demo_mode: bool = False
     llm_mock: bool = False
     user_passwords: str = ""
-    port: int = 8000
+    port: int = 8010
 
     @property
     def async_url(self) -> str:
