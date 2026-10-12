@@ -1,0 +1,76 @@
+[
+  {
+    "role": "scientist",
+    "question": "How do I recalibrate the pH meter and which buffers do I need?",
+    "expected_doc_code": "SOP-QC-PH-001",
+    "expected_page": 1,
+    "kind": "answerable"
+  },
+  {
+    "role": "scientist",
+    "question": "What readings are acceptable for the pH 4.00 buffer during calibration?",
+    "expected_doc_code": "SOP-QC-PH-001",
+    "expected_page": 2,
+    "kind": "answerable"
+  },
+  {
+    "role": "scientist",
+    "question": "What PPE is required to use the pH meter?",
+    "expected_doc_code": "SOP-QC-PH-001",
+    "expected_page": 1,
+    "kind": "answerable"
+  },
+  {
+    "role": "scientist",
+    "question": "How do I tare the analytical balance before weighing a reagent?",
+    "expected_doc_code": "SOP-QC-BAL-001",
+    "expected_page": 1,
+    "kind": "answerable"
+  },
+  {
+    "role": "scientist",
+    "question": "How should I clean up spilled powder after using the analytical balance?",
+    "expected_doc_code": "SOP-QC-BAL-001",
+    "kind": "answerable"
+  },
+  {
+    "role": "scientist",
+    "question": "What causes HPLC peak tailing and how do I fix it?",
+    "expected_doc_code": "TSG-HPLC-001",
+    "kind": "answerable"
+  },
+  {
+    "role": "scientist",
+    "question": "Why are my HPLC retention times fluctuating?",
+    "expected_doc_code": "TSG-HPLC-001",
+    "kind": "answerable"
+  },
+  {
+    "role": "scientist",
+    "question": "What are ghost peaks in HPLC and how do I get rid of them?",
+    "expected_doc_code": "TSG-HPLC-001",
+    "kind": "answerable"
+  },
+  {
+    "role": "scientist",
+    "question": "What is the procedure for a Karl Fischer titration to measure water content?",
+    "kind": "not_covered"
+  },
+  {
+    "role": "scientist",
+    "question": "What dissolution medium and apparatus speed should I use for metformin tablets?",
+    "kind": "not_covered"
+  },
+  {
+    "role": "scientist",
+    "question": "How do I run a western blot transfer?",
+    "kind": "not_covered"
+  },
+  {
+    "role": "scientist",
+    "kind": "troubleshoot_narration",
+    "expected_doc_code": "SOP-QC-PH-001",
+    "symptom": "My pH readings drift and the meter keeps showing the recalibration warning.",
+    "question": "I switched on the pH meter and started straight away. I rinsed the probe with Millipore water, dried it with a Kimwipe, put it in the pH 4.00 buffer and clicked read. Then I rinsed the probe with Millipore water, put it in the pH 6.00 buffer and clicked read. I put the clean probe in my sample solution and clicked read. I switched off the meter, rinsed the probe and put it back in the storage solution."
+  }
+]

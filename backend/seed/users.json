@@ -1,0 +1,6 @@
+[
+  {"username": "scientist", "full_name": "Dr. Anika Rao", "role": "scientist", "department": "Formulation R&D"},
+  {"username": "analyst", "full_name": "Rohan Mehta", "role": "lab_analyst", "department": "Analytical QC"},
+  {"username": "senior", "full_name": "Dr. Meera Iyer", "role": "senior_analyst", "department": "Analytical QC"},
+  {"username": "admin", "full_name": "Vignesh Theerdala", "role": "admin", "department": "IT & Compliance"}
+]

@@ -7,3 +7,7 @@ __pycache__/
 backend/seed/snapshot/*
 !backend/seed/snapshot/.gitkeep
 .pytest_cache/
+
+backend/seed/docs/*.pdf
+backend/seed/docs/*.docx
+backend/seed/reagents.cache.json

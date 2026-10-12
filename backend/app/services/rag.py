@@ -43,9 +43,13 @@ def _citation(n: int, c: dict) -> dict:
             "snippet": snippet, "score": round(float(c.get("cosine", 0.0)), 3)}
 
 
-def _mock_answer(chunks: list[dict], min_score: float) -> str:
+def _mock_answer(chunks: list[dict], min_score: float, question: str = "") -> str:
+    """DEV-ONLY stand-in for the LLM's gate 2: answerable if the top chunks cover most of the question's words."""
+    from app.services.troubleshoot_engine import _tokens
     top = chunks[0]
-    if top["cosine"] < min_score:
+    q = _tokens(question)
+    have = _tokens(" ".join(c["text"] for c in chunks[:2]))
+    if top["cosine"] < min_score or (q and len(q & have) / len(q) < 0.5):
         return "ANSWERABLE: no"
     sentences = re.split(r"(?<=[.!?])\s+", top["text"])
     return "ANSWERABLE: yes\n" + " ".join(sentences[:3]) + " [1]"
@@ -68,7 +72,8 @@ async def _inventory_answer(question: str) -> tuple[str, list[dict]]:
                   if k not in ("hazard_statements",)} for l in lots]
 
 
-async def answer_stream(user: User, question: str, history: list[dict], ip: str | None) -> AsyncIterator[dict]:
+async def answer_stream(user: User, question: str, history: list[dict], ip: str | None,
+                        use_cache: bool = True) -> AsyncIterator[dict]:
     s = get_settings()
     history = history[-6:]
     standalone_q = intent.standalone(question, history)
@@ -100,8 +105,10 @@ async def answer_stream(user: User, question: str, history: list[dict], ip: str 
         return
 
     # ---- cache (also what keeps rehearsed questions working offline)
-    async with session_maker()() as db:
-        hit = await answer_cache.get(db, standalone_q)
+    hit = None
+    if use_cache:
+        async with session_maker()() as db:
+            hit = await answer_cache.get(db, standalone_q)
     if hit:
         for piece in re.findall(r"\S+\s*", hit["answer"]):
             yield {"type": "token", "text": piece}
@@ -140,7 +147,7 @@ async def answer_stream(user: User, question: str, history: list[dict], ip: str 
     buf, answer_parts, decided = "", [], False
     try:
         async for piece in llm.stream(prompt, system=SYSTEM_PROMPT, tier="fast",
-                                      mock=lambda: _mock_answer(chunks, s.vector_min_score)):
+                                      mock=lambda: _mock_answer(chunks, s.vector_min_score, standalone_q)):
             if decided:
                 answer_parts.append(piece)
                 yield {"type": "token", "text": piece}

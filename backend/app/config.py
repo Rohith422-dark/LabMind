@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     llm_rpm: int = 10
     enable_search_grounding: bool = True
     demo_mode: bool = False
+    demo_cards: bool = True   # one-click login cards; always on when DEMO_MODE=1
     llm_mock: bool = False
     user_passwords: str = ""
     port: int = 8010

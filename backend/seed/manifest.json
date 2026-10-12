@@ -1,0 +1,211 @@
+{
+  "_note": "Documents are the real, unmodified PDFs in seed/docs/. doc_code/department/equipment are catalogue metadata added by the team. `steps` overrides are hand-reviewed from the real document text (reviewed: true).",
+  "documents": [
+    {
+      "file": "ph-meter-sop-usc.pdf",
+      "doc_code": "SOP-QC-PH-001",
+      "title": "SOP: VWR SympHony B10P pH Meter",
+      "doc_type": "SOP",
+      "version": 1,
+      "status": "effective",
+      "department": "Analytical QC",
+      "equipment": "pH meter",
+      "change_note": null,
+      "source": "usc-bme-ph",
+      "steps": [
+        {
+          "step_no": 1,
+          "action": "Switch on the pH meter with the power button and wait about 10 seconds for initialization.",
+          "parameters": {
+            "time": {
+              "value": "10",
+              "unit": "s"
+            }
+          },
+          "is_critical": false,
+          "source_page": 1,
+          "reviewed": true
+        },
+        {
+          "step_no": 2,
+          "action": "Prepare the three reference buffers for recalibration (pH 4.00, pH 7.00 and pH 10.00) using the reusable buffers in the 50 mL conical tubes.",
+          "parameters": {},
+          "is_critical": true,
+          "source_page": 1,
+          "reviewed": true
+        },
+        {
+          "step_no": 3,
+          "action": "Remove the probe from the storage solution, rinse it with Millipore water, dry it with a Kimwipe, place it in the pH 4.00 buffer, click read and wait for the stable icon.",
+          "parameters": {
+            "ph": {
+              "value": "4.00",
+              "unit": "pH"
+            }
+          },
+          "is_critical": true,
+          "source_page": 1,
+          "reviewed": true
+        },
+        {
+          "step_no": 4,
+          "action": "Rinse the probe with Millipore water, place it in the pH 7.00 buffer, click read and wait for the stable icon.",
+          "parameters": {
+            "ph": {
+              "value": "7.00",
+              "unit": "pH"
+            }
+          },
+          "is_critical": true,
+          "source_page": 2,
+          "reviewed": true
+        },
+        {
+          "step_no": 5,
+          "action": "Rinse the probe with Millipore water, place it in the pH 10.00 buffer, click read and wait for the stable icon.",
+          "parameters": {
+            "ph": {
+              "value": "10.00",
+              "unit": "pH"
+            }
+          },
+          "is_critical": true,
+          "source_page": 2,
+          "reviewed": true
+        },
+        {
+          "step_no": 6,
+          "action": "Check that each calibration reading is within 0.01 pH of the buffer value (for example 3.99, 4.00 or 4.01 for the pH 4.00 buffer) before continuing.",
+          "parameters": {},
+          "is_critical": true,
+          "source_page": 2,
+          "reviewed": true
+        },
+        {
+          "step_no": 7,
+          "action": "Place the clean probe in the sample solution and click read; rinse the probe with Millipore water before and after each reading.",
+          "parameters": {},
+          "is_critical": false,
+          "source_page": 2,
+          "reviewed": true
+        },
+        {
+          "step_no": 8,
+          "action": "Switch off the meter, clean up spills, rinse the probe and return it to the storage solution so that the solution covers the probe.",
+          "parameters": {},
+          "is_critical": false,
+          "source_page": 2,
+          "reviewed": true
+        }
+      ]
+    },
+    {
+      "file": "balance-sop-usc.pdf",
+      "doc_code": "SOP-QC-BAL-001",
+      "title": "SOP: VWR-224AC Analytical Balance",
+      "doc_type": "SOP",
+      "version": 1,
+      "status": "effective",
+      "department": "Analytical QC",
+      "equipment": "analytical balance",
+      "change_note": null,
+      "source": "usc-bme-balance",
+      "steps": [
+        {
+          "step_no": 1,
+          "action": "Switch on the balance with the On/Off button and wait for the initial calibration (about 30 seconds) to finish.",
+          "parameters": {
+            "time": {
+              "value": "30",
+              "unit": "s"
+            }
+          },
+          "is_critical": false,
+          "source_page": 1,
+          "reviewed": true
+        },
+        {
+          "step_no": 2,
+          "action": "With nothing on the weighing pan, press 0/Delete to zero the balance.",
+          "parameters": {},
+          "is_critical": true,
+          "source_page": 1,
+          "reviewed": true
+        },
+        {
+          "step_no": 3,
+          "action": "Check the weighing unit (default grams, four decimal places); change it with Units/Esc only if needed.",
+          "parameters": {},
+          "is_critical": false,
+          "source_page": 1,
+          "reviewed": true
+        },
+        {
+          "step_no": 4,
+          "action": "Place the weighing paper or boat on the pan and press T/Insert to tare.",
+          "parameters": {},
+          "is_critical": true,
+          "source_page": 1,
+          "reviewed": true
+        },
+        {
+          "step_no": 5,
+          "action": "Add the reagent slowly with a spatula through the side doors, keeping the top door closed, then close the side doors; clean spills with a Kimwipe.",
+          "parameters": {},
+          "is_critical": true,
+          "source_page": 2,
+          "reviewed": true
+        },
+        {
+          "step_no": 6,
+          "action": "Press On/Off to return the balance to sleep mode and clean remaining spills with a Kimwipe sprayed with 70% ethanol.",
+          "parameters": {
+            "percent": {
+              "value": "70",
+              "unit": "%"
+            }
+          },
+          "is_critical": false,
+          "source_page": 2,
+          "reviewed": true
+        }
+      ]
+    },
+    {
+      "file": "balance-sop-kfu.pdf",
+      "doc_code": "SOP-QC-BAL-002",
+      "title": "Instrument Standard Operating Procedure Manual: Analytical Balance (KFU College of Medicine)",
+      "doc_type": "SOP",
+      "version": 1,
+      "status": "effective",
+      "department": "Pharmacology",
+      "equipment": "analytical balance",
+      "change_note": null,
+      "source": "kfu-pharmacology"
+    },
+    {
+      "file": "hplc-sop-kfu.pdf",
+      "doc_code": "SOP-QC-HPLC-001",
+      "title": "Instrument Standard Operating Procedure Manual: High Performance Liquid Chromatography (KFU College of Medicine)",
+      "doc_type": "SOP",
+      "version": 1,
+      "status": "effective",
+      "department": "Pharmacology",
+      "equipment": "HPLC",
+      "change_note": null,
+      "source": "kfu-pharmacology"
+    },
+    {
+      "file": "hplc-troubleshooting-ace.pdf",
+      "doc_code": "TSG-HPLC-001",
+      "title": "HPLC Troubleshooting Guide (ACE / John Dolan)",
+      "doc_type": "troubleshooting_guide",
+      "version": 1,
+      "status": "effective",
+      "department": "Analytical QC",
+      "equipment": "HPLC",
+      "change_note": null,
+      "source": "ace-hplc-guide"
+    }
+  ]
+}

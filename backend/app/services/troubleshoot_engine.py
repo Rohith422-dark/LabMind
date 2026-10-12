@@ -189,8 +189,15 @@ _STOP = set("the a an and or of to in on at for with by is are was were be then 
             "into from using use used this that it as i we you your then".split())
 
 
+def _stem(w: str) -> str:
+    for suf in ("ing", "ed", "es", "s"):
+        if len(w) > len(suf) + 3 and w.endswith(suf):
+            return w[: -len(suf)]
+    return w
+
+
 def _tokens(t: str) -> set[str]:
-    return {w for w in re.findall(r"[a-z]{3,}", (t or "").lower()) if w not in _STOP}
+    return {_stem(w) for w in re.findall(r"[a-z]{3,}", (t or "").lower()) if w not in _STOP}
 
 
 def heuristic_align(sop_steps: list[dict], narrated: list[dict], threshold: float = 0.2) -> list[dict]:

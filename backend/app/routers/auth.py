@@ -52,8 +52,8 @@ async def demo_users(session: AsyncSession = Depends(get_session)):
 @router.post("/demo-login", response_model=LoginOut)
 @limiter.limit("30/minute")
 async def demo_login(request: Request, username: str, session: AsyncSession = Depends(get_session)):
-    """One-click login for the demo cards. Only available when DEMO_MODE=1."""
-    if not get_settings().demo_mode:
+    """One-click login for the demo cards. Only available when DEMO_CARDS=1 or DEMO_MODE=1."""
+    if not (get_settings().demo_mode or get_settings().demo_cards):
         raise HTTPException(404, "Not found")
     user = (await session.execute(select(User).where(User.username == username))).scalar_one_or_none()
     if user is None:
