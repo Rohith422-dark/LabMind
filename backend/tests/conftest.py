@@ -50,8 +50,18 @@ def _schema():
     init(_test_url)
 
 
+@pytest.fixture(scope="session", autouse=True)
+def _clean(_schema):
+    """Fresh content tables per test run (TEST database only; the guard above enforces that)."""
+    import psycopg
+    with psycopg.connect(_test_url, autocommit=True) as c:
+        c.execute("TRUNCATE chunks, sop_steps, document_files, documents, knowledge_gaps, chat_history, answer_cache, "
+                  "ingest_jobs, notifications, troubleshooting_sessions, reagent_requests, inventory_transactions, "
+                  "reagent_lots, reagents CASCADE")
+
+
 @pytest_asyncio.fixture(scope="session", autouse=True)
-async def _users(_schema):
+async def _users(_schema, _clean):
     ph = PasswordHasher()
     async with session_maker()() as s:
         for role, uname in ROLE_USERNAMES.items():

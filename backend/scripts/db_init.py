@@ -41,8 +41,12 @@ def ensure_database(url: str) -> None:
             print(f"created database {name}")
 
 
-def init(url: str) -> None:
+def init(url: str, reset: bool = False) -> None:
     ensure_database(url)
+    if reset:
+        eng0 = create_engine(url.replace("postgresql://", "postgresql+psycopg://", 1))
+        Base.metadata.drop_all(eng0)
+        eng0.dispose()
     with psycopg.connect(url, autocommit=True) as c:
         for ext in ("vector", "pg_trgm", "pgcrypto"):
             c.execute(f"CREATE EXTENSION IF NOT EXISTS {ext}")
@@ -56,4 +60,4 @@ def init(url: str) -> None:
 
 if __name__ == "__main__":
     s = get_settings()
-    init(s.test_database_url if "--test" in sys.argv else s.database_url)
+    init(s.test_database_url if "--test" in sys.argv else s.database_url, reset="--reset" in sys.argv)
