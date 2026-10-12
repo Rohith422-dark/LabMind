@@ -1,0 +1,9 @@
+.env
+node_modules/
+frontend/dist/
+__pycache__/
+.venv/
+*.pyc
+backend/seed/snapshot/*
+!backend/seed/snapshot/.gitkeep
+.pytest_cache/
