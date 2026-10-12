@@ -23,7 +23,7 @@ export default function Login() {
   const [busy, setBusy] = useState(false);
   const cards = useQuery({ queryKey: ["demo-users"], queryFn: () => api<Schemas["DemoUserCard"][]>("/auth/demo-users") });
   const demoEnabled = useQuery({
-    queryKey: ["health"], queryFn: () => api<{ demo_mode: boolean }>("/health"),
+    queryKey: ["health"], queryFn: () => api<{ demo_cards: boolean }>("/health"),
   });
 
   useEffect(() => { if (switching && me) logout(); }, [switching]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -44,7 +44,7 @@ export default function Login() {
       <h1 className="text-4xl font-bold text-brand-900">Smart Lab Assistant</h1>
       <p className="mt-2 text-lg text-slate-600">Approved lab documents are the single source of truth. The scientist makes the final decision.</p>
 
-      {demoEnabled.data?.demo_mode && (
+      {demoEnabled.data?.demo_cards && (
         <section className="mt-8">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Demo accounts — one click</h2>
           {sorted.length === 0 ? (

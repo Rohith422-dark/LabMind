@@ -10,7 +10,7 @@ from app.db import get_session
 from app.deps import require
 from app.models.tables import Chunk, Document, DocumentFile, IngestJob, SopStep, User
 from app.schemas.documents import (
-    DocumentDetail, DocumentOut, HighlightOut, JobCreated, JobOut, PublishIn, RetireIn, StepOutSchema,
+    DocumentDetail, DocumentOut, HighlightOut, JobCreated, JobOut, PublishIn, RetireIn, StepOutSchema, TextSection,
 )
 from app.services import audit, ingest, parser
 from app.services.parser import ParseError
@@ -115,7 +115,7 @@ async def get_document(document_id: uuid.UUID, user: User = require("knowledge.u
     if doc.file_type == "docx":
         chunks = (await session.execute(select(Chunk).where(Chunk.document_id == doc.id)
                                         .order_by(Chunk.seq))).scalars().all()
-        out.text_sections = [{"section": c.section, "text": c.text, "chunk_id": str(c.id)} for c in chunks]
+        out.text_sections = [TextSection(section=c.section, text=c.text, chunk_id=str(c.id)) for c in chunks]
     return out
 
 

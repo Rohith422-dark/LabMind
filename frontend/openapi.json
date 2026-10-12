@@ -97,7 +97,7 @@
      "auth"
     ],
     "summary": "Demo Login",
-    "description": "One-click login for the demo cards. Only available when DEMO_MODE=1.",
+    "description": "One-click login for the demo cards. Only available when DEMO_CARDS=1 or DEMO_MODE=1.",
     "operationId": "demo_login_api_auth_demo_login_post",
     "parameters": [
      {
@@ -438,10 +438,1968 @@
      }
     ]
    }
+  },
+  "/api/documents/extract": {
+   "post": {
+    "tags": [
+     "documents"
+    ],
+    "summary": "Extract",
+    "operationId": "extract_api_documents_extract_post",
+    "requestBody": {
+     "content": {
+      "multipart/form-data": {
+       "schema": {
+        "$ref": "#/components/schemas/Body_extract_api_documents_extract_post"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "202": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/JobCreated"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/documents/jobs/{job_id}": {
+   "get": {
+    "tags": [
+     "documents"
+    ],
+    "summary": "Job Status",
+    "operationId": "job_status_api_documents_jobs__job_id__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "job_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Job Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/JobOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/documents/publish": {
+   "post": {
+    "tags": [
+     "documents"
+    ],
+    "summary": "Publish",
+    "operationId": "publish_api_documents_publish_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PublishIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DocumentOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/documents/{document_id}/retire": {
+   "post": {
+    "tags": [
+     "documents"
+    ],
+    "summary": "Retire",
+    "operationId": "retire_api_documents__document_id__retire_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "document_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Document Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RetireIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DocumentOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/documents": {
+   "get": {
+    "tags": [
+     "documents"
+    ],
+    "summary": "List Documents",
+    "operationId": "list_documents_api_documents_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Q"
+      }
+     },
+     {
+      "name": "type",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Type"
+      }
+     },
+     {
+      "name": "department",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Department"
+      }
+     },
+     {
+      "name": "equipment",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Equipment"
+      }
+     },
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Status"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/DocumentOut"
+         },
+         "title": "Response List Documents Api Documents Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/documents/search": {
+   "get": {
+    "tags": [
+     "documents"
+    ],
+    "summary": "List Documents",
+    "operationId": "list_documents_api_documents_search_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Q"
+      }
+     },
+     {
+      "name": "type",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Type"
+      }
+     },
+     {
+      "name": "department",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Department"
+      }
+     },
+     {
+      "name": "equipment",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Equipment"
+      }
+     },
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Status"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/DocumentOut"
+         },
+         "title": "Response List Documents Api Documents Search Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/documents/{document_id}": {
+   "get": {
+    "tags": [
+     "documents"
+    ],
+    "summary": "Get Document",
+    "operationId": "get_document_api_documents__document_id__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "document_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Document Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DocumentDetail"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/documents/{document_id}/file": {
+   "get": {
+    "tags": [
+     "documents"
+    ],
+    "summary": "Get File",
+    "operationId": "get_file_api_documents__document_id__file_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "document_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Document Id"
+      }
+     },
+     {
+      "name": "download",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "boolean",
+       "default": false,
+       "title": "Download"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/documents/{document_id}/highlights": {
+   "get": {
+    "tags": [
+     "documents"
+    ],
+    "summary": "Highlights",
+    "operationId": "highlights_api_documents__document_id__highlights_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "document_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Document Id"
+      }
+     },
+     {
+      "name": "chunk_id",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Chunk Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HighlightOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/documents/{doc_code}/versions": {
+   "get": {
+    "tags": [
+     "documents"
+    ],
+    "summary": "Versions",
+    "operationId": "versions_api_documents__doc_code__versions_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "doc_code",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Doc Code"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/DocumentOut"
+         },
+         "title": "Response Versions Api Documents  Doc Code  Versions Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/chat/stream": {
+   "post": {
+    "tags": [
+     "chat"
+    ],
+    "summary": "Stream",
+    "operationId": "stream_api_chat_stream_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/StreamIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/chat/external": {
+   "post": {
+    "tags": [
+     "chat"
+    ],
+    "summary": "External",
+    "operationId": "external_api_chat_external_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ExternalIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExternalOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/chat/{chat_id}/feedback": {
+   "patch": {
+    "tags": [
+     "chat"
+    ],
+    "summary": "Feedback",
+    "operationId": "feedback_api_chat__chat_id__feedback_patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "chat_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Chat Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/FeedbackIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HistoryOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/chat/history": {
+   "get": {
+    "tags": [
+     "chat"
+    ],
+    "summary": "History",
+    "operationId": "history_api_chat_history_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 200,
+       "minimum": 1,
+       "default": 50,
+       "title": "Limit"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/HistoryOut"
+         },
+         "title": "Response History Api Chat History Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/gaps": {
+   "get": {
+    "tags": [
+     "gaps"
+    ],
+    "summary": "List Gaps",
+    "operationId": "list_gaps_api_gaps_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/GapOut"
+         },
+         "type": "array",
+         "title": "Response List Gaps Api Gaps Get"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/gaps/{gap_id}/request-sop": {
+   "patch": {
+    "tags": [
+     "gaps"
+    ],
+    "summary": "Request Sop",
+    "operationId": "request_sop_api_gaps__gap_id__request_sop_patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "gap_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Gap Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GapOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/gaps/{gap_id}/link": {
+   "patch": {
+    "tags": [
+     "gaps"
+    ],
+    "summary": "Link Gap",
+    "operationId": "link_gap_api_gaps__gap_id__link_patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "gap_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Gap Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/LinkIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GapOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/troubleshoot/start": {
+   "post": {
+    "tags": [
+     "troubleshoot"
+    ],
+    "summary": "Start",
+    "operationId": "start_api_troubleshoot_start_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/StartIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/troubleshoot/{session_id}/message": {
+   "post": {
+    "tags": [
+     "troubleshoot"
+    ],
+    "summary": "Message",
+    "operationId": "message_api_troubleshoot__session_id__message_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "session_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Session Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MessageIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/troubleshoot/{session_id}/diagnose": {
+   "post": {
+    "tags": [
+     "troubleshoot"
+    ],
+    "summary": "Diagnose",
+    "operationId": "diagnose_api_troubleshoot__session_id__diagnose_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "session_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Session Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/troubleshoot/{session_id}": {
+   "get": {
+    "tags": [
+     "troubleshoot"
+    ],
+    "summary": "Get Session Detail",
+    "operationId": "get_session_detail_api_troubleshoot__session_id__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "session_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Session Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/inventory": {
+   "get": {
+    "tags": [
+     "inventory"
+    ],
+    "summary": "List Inventory",
+    "operationId": "list_inventory_api_inventory_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "name",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Name"
+      }
+     },
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Status"
+      }
+     },
+     {
+      "name": "hazard",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Hazard"
+      }
+     },
+     {
+      "name": "expiring_soon",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "boolean",
+       "default": false,
+       "title": "Expiring Soon"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/LotOut"
+         },
+         "title": "Response List Inventory Api Inventory Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/inventory/reagents": {
+   "get": {
+    "tags": [
+     "inventory"
+    ],
+    "summary": "List Reagents",
+    "operationId": "list_reagents_api_inventory_reagents_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/ReagentOut"
+         },
+         "type": "array",
+         "title": "Response List Reagents Api Inventory Reagents Get"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/inventory/lots": {
+   "post": {
+    "tags": [
+     "inventory"
+    ],
+    "summary": "Add Lot",
+    "operationId": "add_lot_api_inventory_lots_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/LotIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LotOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/inventory/lots/label": {
+   "post": {
+    "tags": [
+     "inventory"
+    ],
+    "summary": "Read Label",
+    "operationId": "read_label_api_inventory_lots_label_post",
+    "requestBody": {
+     "content": {
+      "multipart/form-data": {
+       "schema": {
+        "$ref": "#/components/schemas/Body_read_label_api_inventory_lots_label_post"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LabelOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/inventory/lots/{lot_id}/return": {
+   "post": {
+    "tags": [
+     "inventory"
+    ],
+    "summary": "Return Lot",
+    "operationId": "return_lot_api_inventory_lots__lot_id__return_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "lot_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Lot Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ReturnIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LotOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/inventory/lots/{lot_id}/adjust": {
+   "post": {
+    "tags": [
+     "inventory"
+    ],
+    "summary": "Adjust Lot",
+    "operationId": "adjust_lot_api_inventory_lots__lot_id__adjust_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "lot_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Lot Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AdjustIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LotOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/inventory/lots/{lot_id}/dispose": {
+   "post": {
+    "tags": [
+     "inventory"
+    ],
+    "summary": "Dispose Lot",
+    "operationId": "dispose_lot_api_inventory_lots__lot_id__dispose_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "lot_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Lot Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DisposeIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LotOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/requests": {
+   "post": {
+    "tags": [
+     "requests"
+    ],
+    "summary": "Create Request",
+    "operationId": "create_request_api_requests_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RequestIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RequestOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/requests/mine": {
+   "get": {
+    "tags": [
+     "requests"
+    ],
+    "summary": "My Requests",
+    "operationId": "my_requests_api_requests_mine_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/RequestOut"
+         },
+         "type": "array",
+         "title": "Response My Requests Api Requests Mine Get"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/requests/pending": {
+   "get": {
+    "tags": [
+     "requests"
+    ],
+    "summary": "Pending",
+    "operationId": "pending_api_requests_pending_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/RequestOut"
+         },
+         "type": "array",
+         "title": "Response Pending Api Requests Pending Get"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/requests/{request_id}/issue": {
+   "post": {
+    "tags": [
+     "requests"
+    ],
+    "summary": "Issue",
+    "operationId": "issue_api_requests__request_id__issue_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "request_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Request Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/IssueIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RequestOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/requests/{request_id}/reject": {
+   "post": {
+    "tags": [
+     "requests"
+    ],
+    "summary": "Reject",
+    "operationId": "reject_api_requests__request_id__reject_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "request_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Request Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RejectIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RequestOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/notifications": {
+   "get": {
+    "tags": [
+     "notifications"
+    ],
+    "summary": "List Notifications",
+    "operationId": "list_notifications_api_notifications_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/NotificationOut"
+         },
+         "type": "array",
+         "title": "Response List Notifications Api Notifications Get"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/notifications/{notification_id}/read": {
+   "patch": {
+    "tags": [
+     "notifications"
+    ],
+    "summary": "Mark Read",
+    "operationId": "mark_read_api_notifications__notification_id__read_patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "notification_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Notification Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/NotificationOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/dashboard": {
+   "get": {
+    "tags": [
+     "dashboard"
+    ],
+    "summary": "Dashboard",
+    "operationId": "dashboard_api_dashboard_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DashboardOut"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/demo/questions": {
+   "get": {
+    "tags": [
+     "demo"
+    ],
+    "summary": "Questions",
+    "operationId": "questions_api_demo_questions_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/DemoQuestion"
+         },
+         "type": "array",
+         "title": "Response Questions Api Demo Questions Get"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
   }
  },
  "components": {
   "schemas": {
+   "AdjustIn": {
+    "properties": {
+     "new_quantity": {
+      "type": "number",
+      "minimum": 0.0,
+      "title": "New Quantity"
+     },
+     "reason": {
+      "type": "string",
+      "maxLength": 500,
+      "minLength": 3,
+      "title": "Reason"
+     }
+    },
+    "type": "object",
+    "required": [
+     "new_quantity",
+     "reason"
+    ],
+    "title": "AdjustIn"
+   },
    "AuditOut": {
     "properties": {
      "id": {
@@ -525,6 +2483,156 @@
     ],
     "title": "AuditOut"
    },
+   "Body_extract_api_documents_extract_post": {
+    "properties": {
+     "file": {
+      "type": "string",
+      "contentMediaType": "application/octet-stream",
+      "title": "File"
+     }
+    },
+    "type": "object",
+    "required": [
+     "file"
+    ],
+    "title": "Body_extract_api_documents_extract_post"
+   },
+   "Body_read_label_api_inventory_lots_label_post": {
+    "properties": {
+     "file": {
+      "type": "string",
+      "contentMediaType": "application/octet-stream",
+      "title": "File"
+     }
+    },
+    "type": "object",
+    "required": [
+     "file"
+    ],
+    "title": "Body_read_label_api_inventory_lots_label_post"
+   },
+   "Card": {
+    "properties": {
+     "label": {
+      "type": "string",
+      "title": "Label"
+     },
+     "value": {
+      "type": "integer",
+      "title": "Value"
+     },
+     "link": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Link"
+     }
+    },
+    "type": "object",
+    "required": [
+     "label",
+     "value"
+    ],
+    "title": "Card"
+   },
+   "DashboardOut": {
+    "properties": {
+     "role": {
+      "type": "string",
+      "title": "Role"
+     },
+     "cards": {
+      "items": {
+       "$ref": "#/components/schemas/Card"
+      },
+      "type": "array",
+      "title": "Cards"
+     },
+     "gaps_by_status": {
+      "items": {
+       "$ref": "#/components/schemas/Slice"
+      },
+      "type": "array",
+      "title": "Gaps By Status",
+      "default": []
+     },
+     "lots_by_status": {
+      "items": {
+       "$ref": "#/components/schemas/Slice"
+      },
+      "type": "array",
+      "title": "Lots By Status",
+      "default": []
+     }
+    },
+    "type": "object",
+    "required": [
+     "role",
+     "cards"
+    ],
+    "title": "DashboardOut"
+   },
+   "DemoQuestion": {
+    "properties": {
+     "role": {
+      "type": "string",
+      "title": "Role"
+     },
+     "question": {
+      "type": "string",
+      "title": "Question"
+     },
+     "kind": {
+      "type": "string",
+      "title": "Kind"
+     },
+     "expected_doc_code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Expected Doc Code"
+     },
+     "expected_page": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Expected Page"
+     },
+     "symptom": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Symptom"
+     }
+    },
+    "type": "object",
+    "required": [
+     "role",
+     "question",
+     "kind"
+    ],
+    "title": "DemoQuestion"
+   },
    "DemoUserCard": {
     "properties": {
      "username": {
@@ -565,6 +2673,436 @@
     ],
     "title": "DemoUserCard"
    },
+   "DisposeIn": {
+    "properties": {
+     "reason": {
+      "type": "string",
+      "maxLength": 500,
+      "minLength": 3,
+      "title": "Reason"
+     }
+    },
+    "type": "object",
+    "required": [
+     "reason"
+    ],
+    "title": "DisposeIn"
+   },
+   "DocumentDetail": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Id"
+     },
+     "doc_code": {
+      "type": "string",
+      "title": "Doc Code"
+     },
+     "title": {
+      "type": "string",
+      "title": "Title"
+     },
+     "doc_type": {
+      "type": "string",
+      "enum": [
+       "SOP",
+       "protocol",
+       "troubleshooting_guide",
+       "manual"
+      ],
+      "title": "Doc Type"
+     },
+     "version": {
+      "type": "integer",
+      "title": "Version"
+     },
+     "status": {
+      "type": "string",
+      "enum": [
+       "draft",
+       "effective",
+       "superseded",
+       "retired"
+      ],
+      "title": "Status"
+     },
+     "department": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department"
+     },
+     "equipment": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Equipment"
+     },
+     "change_note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Change Note"
+     },
+     "effective_date": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Effective Date"
+     },
+     "file_type": {
+      "type": "string",
+      "enum": [
+       "pdf",
+       "docx"
+      ],
+      "title": "File Type"
+     },
+     "page_count": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Page Count"
+     },
+     "retire_reason": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Retire Reason"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     },
+     "steps": {
+      "items": {
+       "$ref": "#/components/schemas/StepOutSchema"
+      },
+      "type": "array",
+      "title": "Steps",
+      "default": []
+     },
+     "text_sections": {
+      "items": {
+       "$ref": "#/components/schemas/TextSection"
+      },
+      "type": "array",
+      "title": "Text Sections",
+      "default": []
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "doc_code",
+     "title",
+     "doc_type",
+     "version",
+     "status",
+     "file_type",
+     "created_at"
+    ],
+    "title": "DocumentDetail"
+   },
+   "DocumentOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Id"
+     },
+     "doc_code": {
+      "type": "string",
+      "title": "Doc Code"
+     },
+     "title": {
+      "type": "string",
+      "title": "Title"
+     },
+     "doc_type": {
+      "type": "string",
+      "enum": [
+       "SOP",
+       "protocol",
+       "troubleshooting_guide",
+       "manual"
+      ],
+      "title": "Doc Type"
+     },
+     "version": {
+      "type": "integer",
+      "title": "Version"
+     },
+     "status": {
+      "type": "string",
+      "enum": [
+       "draft",
+       "effective",
+       "superseded",
+       "retired"
+      ],
+      "title": "Status"
+     },
+     "department": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department"
+     },
+     "equipment": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Equipment"
+     },
+     "change_note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Change Note"
+     },
+     "effective_date": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Effective Date"
+     },
+     "file_type": {
+      "type": "string",
+      "enum": [
+       "pdf",
+       "docx"
+      ],
+      "title": "File Type"
+     },
+     "page_count": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Page Count"
+     },
+     "retire_reason": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Retire Reason"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "doc_code",
+     "title",
+     "doc_type",
+     "version",
+     "status",
+     "file_type",
+     "created_at"
+    ],
+    "title": "DocumentOut"
+   },
+   "ExternalIn": {
+    "properties": {
+     "gap_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Gap Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "gap_id"
+    ],
+    "title": "ExternalIn"
+   },
+   "ExternalOut": {
+    "properties": {
+     "chat_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Chat Id"
+     },
+     "answer": {
+      "type": "string",
+      "title": "Answer"
+     },
+     "sources": {
+      "items": {
+       "$ref": "#/components/schemas/WebSourceOut"
+      },
+      "type": "array",
+      "title": "Sources"
+     },
+     "grounded": {
+      "type": "boolean",
+      "title": "Grounded"
+     },
+     "gap_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Gap Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "chat_id",
+     "answer",
+     "sources",
+     "grounded",
+     "gap_id"
+    ],
+    "title": "ExternalOut"
+   },
+   "FeedbackIn": {
+    "properties": {
+     "feedback": {
+      "type": "string",
+      "enum": [
+       "up",
+       "down"
+      ],
+      "title": "Feedback"
+     }
+    },
+    "type": "object",
+    "required": [
+     "feedback"
+    ],
+    "title": "FeedbackIn"
+   },
+   "GapOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Id"
+     },
+     "question": {
+      "type": "string",
+      "title": "Question"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "similar_count": {
+      "type": "integer",
+      "title": "Similar Count"
+     },
+     "requested_by": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Requested By"
+     },
+     "requester_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Requester Name"
+     },
+     "linked_document_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Linked Document Id"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "question",
+     "status",
+     "similar_count",
+     "requested_by",
+     "created_at"
+    ],
+    "title": "GapOut"
+   },
    "HTTPValidationError": {
     "properties": {
      "detail": {
@@ -577,6 +3115,268 @@
     },
     "type": "object",
     "title": "HTTPValidationError"
+   },
+   "HighlightOut": {
+    "properties": {
+     "page": {
+      "type": "integer",
+      "title": "Page"
+     },
+     "page_width": {
+      "type": "number",
+      "title": "Page Width"
+     },
+     "page_height": {
+      "type": "number",
+      "title": "Page Height"
+     },
+     "rects": {
+      "items": {
+       "items": {
+        "type": "number"
+       },
+       "type": "array"
+      },
+      "type": "array",
+      "title": "Rects"
+     },
+     "text": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Text"
+     },
+     "section": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Section"
+     }
+    },
+    "type": "object",
+    "required": [
+     "page",
+     "page_width",
+     "page_height",
+     "rects"
+    ],
+    "title": "HighlightOut"
+   },
+   "HistoryOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Id"
+     },
+     "question": {
+      "type": "string",
+      "title": "Question"
+     },
+     "answer": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Answer"
+     },
+     "source_type": {
+      "type": "string",
+      "title": "Source Type"
+     },
+     "sources": {
+      "items": {},
+      "type": "array",
+      "title": "Sources"
+     },
+     "feedback": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Feedback"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "question",
+     "answer",
+     "source_type",
+     "sources",
+     "feedback",
+     "created_at"
+    ],
+    "title": "HistoryOut"
+   },
+   "IssueIn": {
+    "properties": {
+     "lot_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Lot Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "lot_id"
+    ],
+    "title": "IssueIn"
+   },
+   "JobCreated": {
+    "properties": {
+     "job_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Job Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "job_id"
+    ],
+    "title": "JobCreated"
+   },
+   "JobOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Id"
+     },
+     "filename": {
+      "type": "string",
+      "title": "Filename"
+     },
+     "status": {
+      "type": "string",
+      "enum": [
+       "queued",
+       "parsing",
+       "extracting",
+       "embedding",
+       "ready",
+       "failed",
+       "published"
+      ],
+      "title": "Status"
+     },
+     "progress": {
+      "type": "integer",
+      "title": "Progress"
+     },
+     "error": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Error"
+     },
+     "preview": {
+      "anyOf": [
+       {
+        "additionalProperties": true,
+        "type": "object"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Preview"
+     },
+     "document_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Document Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "filename",
+     "status",
+     "progress"
+    ],
+    "title": "JobOut"
+   },
+   "LabelOut": {
+    "properties": {
+     "reagent_name": {
+      "type": "string",
+      "title": "Reagent Name",
+      "default": ""
+     },
+     "cas_number": {
+      "type": "string",
+      "title": "Cas Number",
+      "default": ""
+     },
+     "lot_no": {
+      "type": "string",
+      "title": "Lot No",
+      "default": ""
+     },
+     "expiry_date": {
+      "type": "string",
+      "title": "Expiry Date",
+      "default": ""
+     },
+     "supplier": {
+      "type": "string",
+      "title": "Supplier",
+      "default": ""
+     }
+    },
+    "type": "object",
+    "title": "LabelOut"
+   },
+   "LinkIn": {
+    "properties": {
+     "document_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Document Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "document_id"
+    ],
+    "title": "LinkIn"
    },
    "LoginIn": {
     "properties": {
@@ -625,6 +3425,330 @@
     ],
     "title": "LoginOut"
    },
+   "LotIn": {
+    "properties": {
+     "reagent_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reagent Id"
+     },
+     "reagent_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reagent Name"
+     },
+     "cas_number": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Cas Number"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     },
+     "lot_no": {
+      "type": "string",
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Lot No"
+     },
+     "grade": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Grade"
+     },
+     "capacity": {
+      "type": "number",
+      "exclusiveMinimum": 0.0,
+      "title": "Capacity"
+     },
+     "quantity_available": {
+      "type": "number",
+      "minimum": 0.0,
+      "title": "Quantity Available"
+     },
+     "location": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Location"
+     },
+     "expiry_date": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Expiry Date"
+     },
+     "received_date": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Received Date"
+     },
+     "storage_conditions": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Storage Conditions"
+     },
+     "supplier": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Supplier"
+     }
+    },
+    "type": "object",
+    "required": [
+     "lot_no",
+     "capacity",
+     "quantity_available"
+    ],
+    "title": "LotIn"
+   },
+   "LotOut": {
+    "properties": {
+     "lot_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Lot Id"
+     },
+     "reagent_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Reagent Id"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "cas_number": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Cas Number"
+     },
+     "formula": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Formula"
+     },
+     "hazard_classes": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Hazard Classes",
+      "default": []
+     },
+     "hazard_statements": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Hazard Statements",
+      "default": []
+     },
+     "reorder_level": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reorder Level"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     },
+     "lot_no": {
+      "type": "string",
+      "title": "Lot No"
+     },
+     "grade": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Grade"
+     },
+     "capacity": {
+      "type": "number",
+      "title": "Capacity"
+     },
+     "quantity_available": {
+      "type": "number",
+      "title": "Quantity Available"
+     },
+     "location": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Location"
+     },
+     "expiry_date": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Expiry Date"
+     },
+     "received_date": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Received Date"
+     },
+     "storage_conditions": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Storage Conditions"
+     },
+     "supplier": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Supplier"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "days_remaining": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Days Remaining"
+     }
+    },
+    "type": "object",
+    "required": [
+     "lot_id",
+     "reagent_id",
+     "name",
+     "lot_no",
+     "capacity",
+     "quantity_available",
+     "status"
+    ],
+    "title": "LotOut"
+   },
    "MeOut": {
     "properties": {
      "user": {
@@ -645,6 +3769,421 @@
     ],
     "title": "MeOut"
    },
+   "MessageIn": {
+    "properties": {
+     "text": {
+      "type": "string",
+      "maxLength": 4000,
+      "minLength": 1,
+      "title": "Text"
+     }
+    },
+    "type": "object",
+    "required": [
+     "text"
+    ],
+    "title": "MessageIn"
+   },
+   "NotificationOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Id"
+     },
+     "message": {
+      "type": "string",
+      "title": "Message"
+     },
+     "link": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Link"
+     },
+     "is_read": {
+      "type": "boolean",
+      "title": "Is Read"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "message",
+     "link",
+     "is_read",
+     "created_at"
+    ],
+    "title": "NotificationOut"
+   },
+   "PublishIn": {
+    "properties": {
+     "job_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Job Id"
+     },
+     "doc_code": {
+      "type": "string",
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Doc Code"
+     },
+     "title": {
+      "type": "string",
+      "maxLength": 500,
+      "minLength": 1,
+      "title": "Title"
+     },
+     "doc_type": {
+      "type": "string",
+      "enum": [
+       "SOP",
+       "protocol",
+       "troubleshooting_guide",
+       "manual"
+      ],
+      "title": "Doc Type"
+     },
+     "department": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department"
+     },
+     "equipment": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Equipment"
+     },
+     "change_note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Change Note"
+     },
+     "steps": {
+      "items": {
+       "$ref": "#/components/schemas/StepIn"
+      },
+      "type": "array",
+      "title": "Steps",
+      "default": []
+     },
+     "gap_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Gap Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "job_id",
+     "doc_code",
+     "title",
+     "doc_type"
+    ],
+    "title": "PublishIn"
+   },
+   "ReagentOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Id"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "cas_number": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Cas Number"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "name"
+    ],
+    "title": "ReagentOut"
+   },
+   "RejectIn": {
+    "properties": {
+     "reason": {
+      "type": "string",
+      "maxLength": 500,
+      "minLength": 3,
+      "title": "Reason"
+     }
+    },
+    "type": "object",
+    "required": [
+     "reason"
+    ],
+    "title": "RejectIn"
+   },
+   "RequestIn": {
+    "properties": {
+     "reagent_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Reagent Id"
+     },
+     "quantity": {
+      "type": "number",
+      "exclusiveMinimum": 0.0,
+      "title": "Quantity"
+     },
+     "purpose": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 1000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Purpose"
+     },
+     "experiment_ref": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 120
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Experiment Ref"
+     }
+    },
+    "type": "object",
+    "required": [
+     "reagent_id",
+     "quantity"
+    ],
+    "title": "RequestIn"
+   },
+   "RequestOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Id"
+     },
+     "reagent_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Reagent Id"
+     },
+     "reagent_name": {
+      "type": "string",
+      "title": "Reagent Name"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     },
+     "quantity": {
+      "type": "number",
+      "title": "Quantity"
+     },
+     "purpose": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Purpose"
+     },
+     "experiment_ref": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Experiment Ref"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "reject_reason": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reject Reason"
+     },
+     "requested_by": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Requested By"
+     },
+     "requester_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Requester Name"
+     },
+     "issued_lot_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Issued Lot Id"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     },
+     "handled_at": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Handled At"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "reagent_id",
+     "reagent_name",
+     "quantity",
+     "status",
+     "requested_by",
+     "created_at"
+    ],
+    "title": "RequestOut"
+   },
+   "RetireIn": {
+    "properties": {
+     "reason": {
+      "type": "string",
+      "maxLength": 500,
+      "minLength": 3,
+      "title": "Reason"
+     }
+    },
+    "type": "object",
+    "required": [
+     "reason"
+    ],
+    "title": "RetireIn"
+   },
+   "ReturnIn": {
+    "properties": {
+     "quantity": {
+      "type": "number",
+      "exclusiveMinimum": 0.0,
+      "title": "Quantity"
+     },
+     "reason": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reason"
+     }
+    },
+    "type": "object",
+    "required": [
+     "quantity"
+    ],
+    "title": "ReturnIn"
+   },
    "RoleUpdate": {
     "properties": {
      "role": {
@@ -663,6 +4202,225 @@
      "role"
     ],
     "title": "RoleUpdate"
+   },
+   "Slice": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "value": {
+      "type": "integer",
+      "title": "Value"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name",
+     "value"
+    ],
+    "title": "Slice"
+   },
+   "StartIn": {
+    "properties": {
+     "document_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Document Id"
+     },
+     "symptom": {
+      "type": "string",
+      "maxLength": 1000,
+      "minLength": 3,
+      "title": "Symptom"
+     },
+     "narration": {
+      "type": "string",
+      "maxLength": 6000,
+      "minLength": 3,
+      "title": "Narration"
+     }
+    },
+    "type": "object",
+    "required": [
+     "symptom",
+     "narration"
+    ],
+    "title": "StartIn"
+   },
+   "StepIn": {
+    "properties": {
+     "step_no": {
+      "type": "integer",
+      "title": "Step No"
+     },
+     "action": {
+      "type": "string",
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Action"
+     },
+     "parameters": {
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Parameters",
+      "default": {}
+     },
+     "is_critical": {
+      "type": "boolean",
+      "title": "Is Critical",
+      "default": false
+     },
+     "source_page": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Source Page"
+     },
+     "reviewed": {
+      "type": "boolean",
+      "title": "Reviewed",
+      "default": false
+     }
+    },
+    "type": "object",
+    "required": [
+     "step_no",
+     "action"
+    ],
+    "title": "StepIn"
+   },
+   "StepOutSchema": {
+    "properties": {
+     "step_no": {
+      "type": "integer",
+      "title": "Step No"
+     },
+     "action": {
+      "type": "string",
+      "title": "Action"
+     },
+     "parameters": {
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Parameters",
+      "default": {}
+     },
+     "is_critical": {
+      "type": "boolean",
+      "title": "Is Critical",
+      "default": false
+     },
+     "source_page": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Source Page"
+     },
+     "reviewed": {
+      "type": "boolean",
+      "title": "Reviewed",
+      "default": false
+     }
+    },
+    "type": "object",
+    "required": [
+     "step_no",
+     "action"
+    ],
+    "title": "StepOutSchema"
+   },
+   "StreamIn": {
+    "properties": {
+     "question": {
+      "type": "string",
+      "maxLength": 2000,
+      "minLength": 2,
+      "title": "Question"
+     },
+     "history": {
+      "items": {
+       "$ref": "#/components/schemas/Turn"
+      },
+      "type": "array",
+      "title": "History",
+      "default": []
+     }
+    },
+    "type": "object",
+    "required": [
+     "question"
+    ],
+    "title": "StreamIn"
+   },
+   "TextSection": {
+    "properties": {
+     "section": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Section"
+     },
+     "text": {
+      "type": "string",
+      "title": "Text"
+     },
+     "chunk_id": {
+      "type": "string",
+      "title": "Chunk Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "text",
+     "chunk_id"
+    ],
+    "title": "TextSection"
+   },
+   "Turn": {
+    "properties": {
+     "role": {
+      "type": "string",
+      "enum": [
+       "user",
+       "assistant"
+      ],
+      "title": "Role"
+     },
+     "content": {
+      "type": "string",
+      "maxLength": 4000,
+      "title": "Content"
+     }
+    },
+    "type": "object",
+    "required": [
+     "role",
+     "content"
+    ],
+    "title": "Turn"
    },
    "UserCreate": {
     "properties": {
@@ -831,6 +4589,29 @@
      "first_broken_id"
     ],
     "title": "VerifyOut"
+   },
+   "WebSourceOut": {
+    "properties": {
+     "title": {
+      "type": "string",
+      "title": "Title"
+     },
+     "uri": {
+      "type": "string",
+      "title": "Uri"
+     },
+     "domain": {
+      "type": "string",
+      "title": "Domain"
+     }
+    },
+    "type": "object",
+    "required": [
+     "title",
+     "uri",
+     "domain"
+    ],
+    "title": "WebSourceOut"
    }
   },
   "securitySchemes": {

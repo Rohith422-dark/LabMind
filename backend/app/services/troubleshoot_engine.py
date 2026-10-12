@@ -200,27 +200,50 @@ def _tokens(t: str) -> set[str]:
     return {_stem(w) for w in re.findall(r"[a-z]{3,}", (t or "").lower()) if w not in _STOP}
 
 
-def heuristic_align(sop_steps: list[dict], narrated: list[dict], threshold: float = 0.2) -> list[dict]:
-    """Best-overlap alignment when no LLM is available (dev mock / LLM failure fallback)."""
-    toks = {s["step_no"]: _tokens(s["action"]) for s in sop_steps}
-    taken: set[int] = set()
-    out = []
-    for n in narrated:
-        nt = _tokens(n["action"])
-        best, score = None, 0.0
-        for no, st in toks.items():
-            if no in taken or not st or not nt:
-                continue
-            j = len(nt & st) / len(nt | st)
-            if j > score:
-                best, score = no, j
-        n = dict(n)
-        if best is not None and score >= threshold:
-            n["aligned_step_no"] = best
-            taken.add(best)
+def _similarity(n: dict, s: dict) -> float:
+    nt, st = _tokens(n["action"]), _tokens(s["action"])
+    if not nt or not st:
+        return 0.0
+    inter = len(nt & st)
+    score = 0.5 * inter / len(nt | st) + 0.5 * inter / len(nt)
+    # same kind of parameter (e.g. both mention a pH): small bonus, larger when the values are close
+    for name, p in (n.get("parameters") or {}).items():
+        q = _named_quant(name, p)
+        for sname, sp in (s.get("parameters") or {}).items():
+            sq = _named_quant(sname, sp)
+            if q and sq and q.kind == sq.kind:
+                score += 0.05 + 0.05 / (1 + abs(q.value - sq.value))
+    return score
+
+
+def heuristic_align(sop_steps: list[dict], narrated: list[dict], threshold: float = 0.15) -> list[dict]:
+    """Order-preserving best alignment (DP) when no LLM is available (dev mock / LLM failure fallback)."""
+    sop = sorted(sop_steps, key=lambda s: s["step_no"])
+    nar = sorted(narrated, key=lambda n: n.get("order", 0))
+    n, m = len(nar), len(sop)
+    sim = [[_similarity(nar[i], sop[j]) for j in range(m)] for i in range(n)]
+    dp = [[0.0] * (m + 1) for _ in range(n + 1)]
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            best = max(dp[i - 1][j], dp[i][j - 1])
+            if sim[i - 1][j - 1] >= threshold:
+                best = max(best, dp[i - 1][j - 1] + sim[i - 1][j - 1])
+            dp[i][j] = best
+    match: dict[int, int] = {}
+    i, j = n, m
+    while i > 0 and j > 0:
+        if sim[i - 1][j - 1] >= threshold and abs(dp[i][j] - (dp[i - 1][j - 1] + sim[i - 1][j - 1])) < 1e-12:
+            match[i - 1] = sop[j - 1]["step_no"]
+            i, j = i - 1, j - 1
+        elif dp[i - 1][j] >= dp[i][j - 1]:
+            i -= 1
         else:
-            n["aligned_step_no"] = None
-        out.append(n)
+            j -= 1
+    out = []
+    for k, item in enumerate(nar):
+        item = dict(item)
+        item["aligned_step_no"] = match.get(k)
+        out.append(item)
     return out
 
 

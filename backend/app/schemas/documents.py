@@ -36,9 +36,15 @@ class StepOutSchema(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class TextSection(BaseModel):
+    section: str | None = None
+    text: str
+    chunk_id: str
+
+
 class DocumentDetail(DocumentOut):
     steps: list[StepOutSchema] = []
-    text_sections: list[dict] = []   # DOCX viewer: [{section, text, chunk_id}]
+    text_sections: list[TextSection] = []   # DOCX viewer
 
 
 class JobOut(BaseModel):

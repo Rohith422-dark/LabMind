@@ -4,7 +4,11 @@ import {
   BookOpen, Boxes, ClipboardList, FlaskConical, Gauge, History, LogOut, MessageSquare, PanelLeftClose,
   PanelLeftOpen, ScrollText, ShieldCheck, Users, Wrench, Calculator, Lightbulb, type LucideIcon,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/api/client";
 import { useAuth } from "@/context/AuthContext";
+import { Guide } from "@/components/Guide";
+import { NotificationBell } from "@/components/NotificationBell";
 
 interface NavItem { to: string; label: string; icon: LucideIcon; permission: string }
 
@@ -31,6 +35,7 @@ export function Layout() {
   const { me, can, logout } = useAuth();
   const nav = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const health = useQuery({ queryKey: ["health"], queryFn: () => api<{ llm_mock: boolean; ai_configured: boolean }>("/health") });
   if (!me) return null;
 
   return (
@@ -68,9 +73,13 @@ export function Layout() {
         </div>
       </aside>
       <main className="flex min-w-0 flex-1 flex-col overflow-y-auto">
+        {health.data?.llm_mock && <div className="bg-red-600 px-4 py-1 text-center text-sm font-bold tracking-widest text-white">MOCK AI — DEVELOPMENT ONLY · answers are not from a real model</div>}
+        {health.data && !health.data.ai_configured && <div className="bg-amber-100 px-4 py-1 text-center text-sm text-amber-900">AI not configured — add GEMINI_API_KEY to backend/.env. Non-AI pages still work.</div>}
+        <div className="flex justify-end border-b border-slate-200 bg-white px-6 py-2"><NotificationBell /></div>
         <div className="flex-1 p-6"><Outlet /></div>
         <footer className="border-t border-slate-200 px-6 py-2 text-xs text-slate-500">Demo build · public documents</footer>
       </main>
+      <Guide />
     </div>
   );
 }

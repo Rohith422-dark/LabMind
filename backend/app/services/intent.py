@@ -9,10 +9,10 @@ PRONOUN = re.compile(r"\b(it|that|this|they|them|those|these|its|the same|there)
 
 def classify(question: str) -> str:
     """Rules first. Ambiguous -> SOP RAG."""
-    if INVENTORY.search(question):
-        return "inventory"
     if CALC.search(question):
         return "calculator"
+    if INVENTORY.search(question):
+        return "inventory"
     return "sop"
 
 

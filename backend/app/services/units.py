@@ -115,7 +115,7 @@ def fmt(kind: str, value: float) -> str:
     if kind == "percent":
         return f"{value:g} %"
     if kind == "ph":
-        return f"pH {value:g}"
+        return f"pH {value:.2f}"
     if kind == "flow":
         return f"{value:g} mL/min"
     if kind == "concentration":

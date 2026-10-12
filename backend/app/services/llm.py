@@ -52,6 +52,7 @@ class Grounded:
 _limiter: AsyncLimiter | None = None
 _client = None
 _sim429_left: int | None = None
+RETRY_INITIAL = 1.0  # seconds; tests shrink this
 
 
 def _get_limiter() -> AsyncLimiter:
@@ -150,7 +151,7 @@ async def _call(fn: Callable[[str], Any], tier: str, timeout: float = 60.0) -> A
         try:
             async for attempt in AsyncRetrying(
                 retry=retry_if_exception(_retryable), stop=stop_after_attempt(3),
-                wait=wait_exponential_jitter(initial=1, max=8), reraise=True,
+                wait=wait_exponential_jitter(initial=RETRY_INITIAL, max=8), reraise=True,
             ):
                 with attempt:
                     async with _get_limiter():

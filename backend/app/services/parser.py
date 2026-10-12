@@ -172,22 +172,37 @@ def render_page_png(data: bytes, page_no: int, zoom: float = 2.0) -> bytes:
     return doc[page_no - 1].get_pixmap(matrix=pymupdf.Matrix(zoom, zoom)).tobytes("png")
 
 
-def find_highlights(data: bytes, page_no: int, chunk_text: str, max_phrases: int = 6) -> dict:
-    """Rects for the cited passage on a page, from several short phrases of the chunk."""
+def _merge_rects(rects: list[list[float]], gap: float = 14.0) -> list[list[float]]:
+    """Merge rectangles on the same line (small horizontal gap) so the highlight reads as continuous text."""
+    rects = sorted(rects, key=lambda r: (round((r[1] + r[3]) / 2 / 3), r[0]))
+    out: list[list[float]] = []
+    for r in rects:
+        if out:
+            m = out[-1]
+            same_line = min(m[3], r[3]) - max(m[1], r[1]) > 0.5 * min(m[3] - m[1], r[3] - r[1])
+            if same_line and r[0] <= m[2] + gap:
+                m[0], m[1], m[2], m[3] = min(m[0], r[0]), min(m[1], r[1]), max(m[2], r[2]), max(m[3], r[3])
+                continue
+        out.append(list(r))
+    return [[round(v, 1) for v in r] for r in out]
+
+
+def find_highlights(data: bytes, page_no: int, chunk_text: str, window: int = 5, stride: int = 3,
+                    max_words: int = 420) -> dict:
+    """Rects for the cited passage: dense short phrases from the chunk located with search_for, then merged."""
     import pymupdf
     doc = pymupdf.open(stream=data, filetype="pdf")
     page = doc[page_no - 1]
-    words = chunk_text.split()
-    phrases: list[str] = []
-    n = 6
-    for start in range(0, max(1, len(words) - n + 1), max(n, len(words) // max_phrases or 1)):
-        ph = " ".join(words[start:start + n])
-        if len(ph) >= 12:
-            phrases.append(ph)
-        if len(phrases) >= max_phrases:
-            break
-    rects: list[list[float]] = []
-    for ph in phrases:
+    words = chunk_text.split()[:max_words]
+    raw: list[list[float]] = []
+    seen: set[tuple] = set()
+    for start in range(0, max(1, len(words) - window + 1), stride):
+        ph = " ".join(words[start:start + window])
+        if len(ph) < 12:
+            continue
         for r in page.search_for(ph):
-            rects.append([round(r.x0, 1), round(r.y0, 1), round(r.x1, 1), round(r.y1, 1)])
-    return {"page": page_no, "page_width": page.rect.width, "page_height": page.rect.height, "rects": rects}
+            key = (round(r.x0), round(r.y0), round(r.x1), round(r.y1))
+            if key not in seen:
+                seen.add(key)
+                raw.append([r.x0, r.y0, r.x1, r.y1])
+    return {"page": page_no, "page_width": page.rect.width, "page_height": page.rect.height, "rects": _merge_rects(raw)}
