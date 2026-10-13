@@ -43,3 +43,11 @@ def test_pubchem_ghs_parser():
     classes, stmts = parse_ghs(view)
     assert classes == ["Flammable", "Irritant"]
     assert stmts == ["H225: Highly Flammable liquid and vapor", "H319: Causes serious eye irritation"]
+
+
+def test_hazard_name_matching_ignores_generic_words():
+    from app.services.inventory import _distinctive
+    assert _distinctive("Caffeine reference standard") == "caffeine"
+    assert _distinctive("Water (HPLC grade)") is None
+    assert _distinctive("2-Propanol") == "2-propanol"
+    assert _distinctive("Formic acid") == "formic acid"

@@ -117,7 +117,8 @@ def _thinking(model: str, tier: str):
     high = tier == "reasoning"
     try:
         if "gemini-3" in model:
-            return types.ThinkingConfig(thinking_level="high" if high else "low")
+            # "high" measured ~2.5x slower on the free tier; "medium" keeps the extra reasoning at demo-friendly latency
+            return types.ThinkingConfig(thinking_level="medium" if high else "low")
         return types.ThinkingConfig(thinking_budget=2048 if high else 0)
     except Exception:  # SDK without that field: leave default
         return None

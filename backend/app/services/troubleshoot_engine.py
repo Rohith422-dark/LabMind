@@ -54,6 +54,8 @@ def _bare(p: dict) -> units.Quantity | None:
 
 
 def _named_quant(name: str, p: Any) -> units.Quantity | None:
+    if isinstance(p, dict) and not p.get("unit") and name == "ph":
+        p = {**p, "unit": "pH"}  # pH is dimensionless: models often omit the unit
     q = _quant(p)
     if q is None:
         return None

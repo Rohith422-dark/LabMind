@@ -61,6 +61,18 @@ async def lots_for(session: AsyncSession, reagent_ids: list) -> list[dict]:
     return [row_to_lot(r) for r in rows]
 
 
+_GENERIC = {"reference", "standard", "solution", "buffer", "grade", "hplc", "anhydrous", "pellets"}
+_BENIGN = {"water"}
+
+
+def _distinctive(name: str) -> str | None:
+    """'Caffeine reference standard' -> 'caffeine'; 'Water (HPLC grade)' -> None (benign, appears everywhere)."""
+    base = re.sub(r"\([^)]*\)", " ", name.lower())
+    words = [w for w in re.findall(r"[a-z0-9-]+", base) if w not in _GENERIC]
+    phrase = " ".join(words).strip()
+    return None if not phrase or phrase in _BENIGN else phrase
+
+
 async def hazard_note(session: AsyncSession, texts: list[str]) -> str | None:
     """Safety note built from the reagents table (never LLM-generated)."""
     rows = (await session.execute(text(
@@ -68,8 +80,8 @@ async def hazard_note(session: AsyncSession, texts: list[str]) -> str | None:
     blob = " ".join(texts).lower()
     parts = []
     for name, classes, stmts in rows:
-        n = name.lower()
-        if re.search(rf"\b{re.escape(n)}\b", blob) or any(len(w) >= 6 and re.search(rf"\b{re.escape(w)}\b", blob) for w in n.split()):
+        key = _distinctive(name)
+        if key and re.search(r"\b" + re.escape(key) + r"\b", blob):
             parts.append(f"{name}: {'; '.join(stmts[:4])}" + (f" ({', '.join(classes[:3])})" if classes else ""))
     if not parts:
         return None

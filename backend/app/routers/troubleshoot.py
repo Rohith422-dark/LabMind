@@ -88,7 +88,9 @@ async def _structure_and_align(text_in: str, sop_steps: list[dict], start_order:
     """Free text -> structured, SOP-aligned narrated steps (LLM, with deterministic fallback)."""
     fallback = eng.heuristic_structure(text_in)
     try:
-        s = await llm.generate_structured(text_in, StructuredOut, system=STRUCTURE_PROMPT,
+        ref = "\n".join(f"{x['step_no']}. {x['action']}" for x in sop_steps)
+        s = await llm.generate_structured(f"SOP steps (for granularity only):\n{ref}\n\nScientist's account:\n{text_in}",
+                                          StructuredOut, system=STRUCTURE_PROMPT,
                                           mock=StructuredOut(steps=[NarratedStep(order=f["order"], action=f["action"])
                                                                     for f in fallback]))
         steps = [{"order": n.order, "action": n.action, "parameters": params_to_dict(n.parameters),
