@@ -73,7 +73,7 @@ async def ai_checks(s) -> None:
 
 def main() -> int:
     s = get_settings()
-    print("Smart Lab Assistant preflight\n")
+    print("LabMind preflight\n")
     print("Configuration")
     check(s.jwt_secret not in ("", "dev-secret", "change-me-to-a-long-random-string") and len(s.jwt_secret) >= 24,
           "JWT_SECRET is set and strong")

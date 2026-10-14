@@ -11,3 +11,9 @@ backend/seed/snapshot/*
 backend/seed/docs/*.pdf
 backend/seed/docs/*.docx
 backend/seed/reagents.cache.json
+
+backend/storage/
+
+# local database dumps contain user password hashes - never commit
+backup-*.sql
+*.dump

@@ -9,7 +9,7 @@ export default function KnowledgeGaps() {
   const top = (q.data ?? []).slice(0, 8).map((g) => ({ name: g.question.length > 38 ? g.question.slice(0, 36) + "…" : g.question, asked: g.similar_count }));
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Knowledge gaps</h1>
+      <h1 className="text-[26px] font-semibold leading-tight">Knowledge gaps</h1>
       <p className="text-slate-600">Questions the approved documents could not answer. Upload the missing document to close the loop — the requester is notified automatically.</p>
       {q.isLoading && <Spinner />}
       {q.data?.length === 0 && <Empty title="No knowledge gaps">When a scientist asks something the approved documents do not cover, it appears here.</Empty>}
@@ -30,7 +30,7 @@ export default function KnowledgeGaps() {
               <td className="px-3 py-2">{g.question}</td><td className="px-3 py-2">{g.similar_count}×</td>
               <td className="px-3 py-2">{g.requester_name}<div className="text-xs text-slate-500">{new Date(g.created_at).toLocaleString()}</div></td>
               <td className="px-3 py-2"><StatusBadge status={g.status} /></td>
-              <td className="px-3 py-2">{g.status !== "resolved" && <Link className="btn-primary px-3 py-1" to={`/sop-management?gap=${g.id}`}>Upload SOP</Link>}
+              <td className="px-3 py-2">{g.status !== "resolved" && <Link className="btn-primary px-3 py-1" to={`/sops?gap=${g.id}`}>Upload SOP</Link>}
                 {g.linked_document_id && <Link className="text-brand-700 underline" to={`/sops/${g.linked_document_id}`}>View document</Link>}</td>
             </tr>))}</tbody></table></div>
       )}

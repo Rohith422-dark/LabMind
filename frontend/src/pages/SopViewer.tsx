@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Download } from "lucide-react";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ export default function SopViewer() {
   const { id = "" } = useParams();
   const { can } = useAuth();
   const qc = useQueryClient();
+  const nav = useNavigate();
   const [reason, setReason] = useState("");
   const doc = useQuery({ queryKey: ["doc", id], queryFn: () => api<Schemas["DocumentDetail"]>(`/documents/${id}`) });
   const versions = useQuery({
@@ -24,6 +25,11 @@ export default function SopViewer() {
     onSuccess: () => { toast.success("Document retired"); void qc.invalidateQueries(); },
     onError: (e) => toast.error(errMsg(e)),
   });
+  const del = useMutation({
+    mutationFn: () => api(`/documents/code/${encodeURIComponent(doc.data!.doc_code)}`, { method: "DELETE" }),
+    onSuccess: () => { toast.success("Document and all its versions deleted"); void qc.invalidateQueries(); nav("/sops"); },
+    onError: (e) => toast.error(errMsg(e)),
+  });
   if (doc.isLoading) return <Spinner label="Loading…" />;
   const d = doc.data;
   if (!d) return <Banner tone="red">{errMsg(doc.error)}</Banner>;
@@ -33,11 +39,15 @@ export default function SopViewer() {
       <Link to="/sops" className="text-sm text-brand-700 underline">← SOP library</Link>
       <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">{d.doc_code} <span className="font-normal text-slate-500">v{d.version}</span> <StatusBadge status={d.status} /></h1>
+          <h1 className="text-[26px] font-semibold leading-tight">{d.doc_code} <span className="font-normal text-slate-500">v{d.version}</span> <StatusBadge status={d.status} /></h1>
           <div className="text-slate-700">{d.title}</div>
           <div className="text-xs text-slate-500">{d.doc_type.replace("_", " ")} · {d.equipment ?? "—"} · {d.department ?? "—"}{d.change_note ? ` · Change note: ${d.change_note}` : ""}</div>
         </div>
-        <button className="btn-secondary" onClick={() => downloadDoc(d.id, `${d.doc_code}-v${d.version}.${d.file_type}`)}><Download size={16} />Download</button>
+        <div className="flex flex-wrap gap-2">
+          {can("sop.manage") && <button className="btn-secondary" onClick={() => nav(`/sops?update=${encodeURIComponent(d.doc_code)}`)}>Upload new version</button>}
+          {can("sop.manage") && <button className="btn-secondary text-red-700" onClick={() => { if (window.confirm(`Permanently delete ${d.doc_code} and ALL its versions?`)) del.mutate(); }}>Delete</button>}
+          <button className="btn-secondary" onClick={() => downloadDoc(d.id, `${d.doc_code}-v${d.version}.${d.file_type}`)}><Download size={16} />Download</button>
+        </div>
       </div>
       {d.status !== "effective" && (
         <div className="mt-3"><Banner tone="red"><b>{d.status === "superseded" ? "SUPERSEDED" : d.status.toUpperCase()} — DO NOT USE.</b>
@@ -52,7 +62,8 @@ export default function SopViewer() {
         </div>
         <div className="space-y-4">
           <div className="card p-4">
-            <h2 className="mb-2 font-semibold">Version history</h2>
+            <h2 className="mb-1 font-semibold">Version history</h2>
+            <p className="mb-2 text-xs text-slate-500">You are viewing v{d.version}. Select an earlier version to read it (shown for reference only).</p>
             <ul className="space-y-1 text-sm">
               {versions.data?.map((v) => (
                 <li key={v.id} className="flex items-center justify-between">

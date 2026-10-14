@@ -929,6 +929,47 @@
     }
    }
   },
+  "/api/documents/code/{doc_code}": {
+   "delete": {
+    "tags": [
+     "documents"
+    ],
+    "summary": "Delete Document Code",
+    "description": "Permanently delete a document with ALL its versions (files, passages, steps). Use 'retire' to keep a reference copy instead.",
+    "operationId": "delete_document_code_api_documents_code__doc_code__delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "doc_code",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Doc Code"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
   "/api/documents/{document_id}/file": {
    "get": {
     "tags": [
@@ -1138,6 +1179,51 @@
     ]
    }
   },
+  "/api/chat/assistant/project-answer": {
+   "post": {
+    "tags": [
+     "chat"
+    ],
+    "summary": "Assistant Project Answer",
+    "description": "The user said yes to 'may I look at your project data?': run the evidence-grounded project pipeline for the project\nthey chose (membership checked here), inside their general conversation.",
+    "operationId": "assistant_project_answer_api_chat_assistant_project_answer_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProjectAnswerIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
   "/api/chat/external": {
    "post": {
     "tags": [
@@ -1282,6 +1368,325 @@
         }
        }
       }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/chat/conversations": {
+   "get": {
+    "tags": [
+     "chat"
+    ],
+    "summary": "Conversations",
+    "description": "Recent chats of the current user only (newest first). Conversations of projects the user no longer belongs to are hidden.",
+    "operationId": "conversations_api_chat_conversations_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 100,
+       "minimum": 1,
+       "default": 30,
+       "title": "Limit"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "format": "uuid"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Project Id"
+      }
+     },
+     {
+      "name": "scope",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "pattern": "^(all|global|project)$",
+       "default": "all",
+       "title": "Scope"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/ConversationOut"
+         },
+         "title": "Response Conversations Api Chat Conversations Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/chat/conversations/{conversation_id}": {
+   "get": {
+    "tags": [
+     "chat"
+    ],
+    "summary": "Conversation",
+    "operationId": "conversation_api_chat_conversations__conversation_id__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "conversation_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Conversation Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/HistoryOut"
+         },
+         "title": "Response Conversation Api Chat Conversations  Conversation Id  Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "patch": {
+    "tags": [
+     "chat"
+    ],
+    "summary": "Rename Conversation",
+    "operationId": "rename_conversation_api_chat_conversations__conversation_id__patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "conversation_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Conversation Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RenameIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConversationOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "tags": [
+     "chat"
+    ],
+    "summary": "Delete Conversation",
+    "description": "Permanent: messages, the summary and the external-allowed flag go with it.",
+    "operationId": "delete_conversation_api_chat_conversations__conversation_id__delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "conversation_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Conversation Id"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/chat/conversations/{conversation_id}/memory": {
+   "get": {
+    "tags": [
+     "chat"
+    ],
+    "summary": "Conversation Memory",
+    "operationId": "conversation_memory_api_chat_conversations__conversation_id__memory_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "conversation_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Conversation Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConversationMemoryOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "tags": [
+     "chat"
+    ],
+    "summary": "Clear Conversation Memory",
+    "description": "Forget the summary and withdraw 'allow external search for this conversation'.",
+    "operationId": "clear_conversation_memory_api_chat_conversations__conversation_id__memory_delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "conversation_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Conversation Id"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
      },
      "422": {
       "description": "Validation Error",
@@ -1724,6 +2129,81 @@
     }
    }
   },
+  "/api/inventory/reagents/summary": {
+   "get": {
+    "tags": [
+     "inventory"
+    ],
+    "summary": "Reagent Summary",
+    "description": "One row per reagent: physical vs usable vs reserved vs expired/unavailable stock and the resulting availability label.",
+    "operationId": "reagent_summary_api_inventory_reagents_summary_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "name",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Name"
+      }
+     },
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Status"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/ReagentSummaryOut"
+         },
+         "title": "Response Reagent Summary Api Inventory Reagents Summary Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
   "/api/inventory/reagents": {
    "get": {
     "tags": [
@@ -2020,6 +2500,124 @@
     }
    }
   },
+  "/api/inventory/lots/{lot_id}/receive": {
+   "post": {
+    "tags": [
+     "inventory"
+    ],
+    "summary": "Receive Stock",
+    "description": "Stock actually arrived (or was replaced). The only way quantity goes UP other than a counted adjustment/return,\nand it is relative, so two deliveries booked at the same moment both count.",
+    "operationId": "receive_stock_api_inventory_lots__lot_id__receive_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "lot_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Lot Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ReceiveIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LotOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/inventory/lots/{lot_id}": {
+   "patch": {
+    "tags": [
+     "inventory"
+    ],
+    "summary": "Edit Lot",
+    "description": "Batch number, expiry, location, storage and availability. Needs the version the editor saw; a stale edit is rejected (409).",
+    "operationId": "edit_lot_api_inventory_lots__lot_id__patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "lot_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Lot Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/LotPatch"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LotOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
   "/api/requests": {
    "post": {
     "tags": [
@@ -2027,15 +2625,20 @@
     ],
     "summary": "Create Request",
     "operationId": "create_request_api_requests_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
     "requestBody": {
+     "required": true,
      "content": {
       "application/json": {
        "schema": {
         "$ref": "#/components/schemas/RequestIn"
        }
       }
-     },
-     "required": true
+     }
     },
     "responses": {
      "201": {
@@ -2058,12 +2661,167 @@
        }
       }
      }
-    },
+    }
+   },
+   "get": {
+    "tags": [
+     "requests"
+    ],
+    "summary": "Manage List",
+    "operationId": "manage_list_api_requests_get",
     "security": [
      {
       "HTTPBearer": []
      }
-    ]
+    ],
+    "parameters": [
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Status"
+      }
+     },
+     {
+      "name": "reagent",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "maxLength": 200
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Reagent"
+      }
+     },
+     {
+      "name": "requester",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "maxLength": 120
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Requester"
+      }
+     },
+     {
+      "name": "urgency",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "pattern": "^(low|normal|high|urgent)$"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Urgency"
+      }
+     },
+     {
+      "name": "date_from",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "format": "date"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Date From"
+      }
+     },
+     {
+      "name": "date_to",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "format": "date"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Date To"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 100,
+       "minimum": 1,
+       "default": 25,
+       "title": "Limit"
+      }
+     },
+     {
+      "name": "offset",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 0,
+       "default": 0,
+       "title": "Offset"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RequestPage"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
    }
   },
   "/api/requests/mine": {
@@ -2073,27 +2831,67 @@
     ],
     "summary": "My Requests",
     "operationId": "my_requests_api_requests_mine_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Status"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 200,
+       "minimum": 1,
+       "default": 100,
+       "title": "Limit"
+      }
+     }
+    ],
     "responses": {
      "200": {
       "description": "Successful Response",
       "content": {
        "application/json": {
         "schema": {
+         "type": "array",
          "items": {
           "$ref": "#/components/schemas/RequestOut"
          },
-         "type": "array",
          "title": "Response My Requests Api Requests Mine Get"
         }
        }
       }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
      }
-    },
-    "security": [
-     {
-      "HTTPBearer": []
-     }
-    ]
+    }
    }
   },
   "/api/requests/pending": {
@@ -2102,6 +2900,7 @@
      "requests"
     ],
     "summary": "Pending",
+    "description": "Everything still open (not rejected/fulfilled), oldest first.",
     "operationId": "pending_api_requests_pending_get",
     "responses": {
      "200": {
@@ -2126,12 +2925,297 @@
     ]
    }
   },
+  "/api/requests/{request_id}": {
+   "get": {
+    "tags": [
+     "requests"
+    ],
+    "summary": "Get Request",
+    "description": "The requester sees their own request; lab assistants see all. Anyone else gets 404.",
+    "operationId": "get_request_api_requests__request_id__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "request_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Request Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RequestDetail"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/requests/{request_id}/respond": {
+   "post": {
+    "tags": [
+     "requests"
+    ],
+    "summary": "Respond",
+    "description": "The requester answers a clarification request; the request goes back to 'under review'.",
+    "operationId": "respond_api_requests__request_id__respond_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "request_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Request Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RespondIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RequestDetail"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/requests/{request_id}/comment": {
+   "post": {
+    "tags": [
+     "requests"
+    ],
+    "summary": "Comment",
+    "operationId": "comment_api_requests__request_id__comment_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "request_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Request Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CommentIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RequestDetail"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/requests/{request_id}/transition": {
+   "post": {
+    "tags": [
+     "requests"
+    ],
+    "summary": "Transition",
+    "description": "Move a request along the lifecycle. `fulfilled` is not reachable here - use /fulfil, which records what actually happened.",
+    "operationId": "transition_api_requests__request_id__transition_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "request_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Request Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TransitionIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RequestDetail"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/requests/{request_id}/fulfil": {
+   "post": {
+    "tags": [
+     "requests"
+    ],
+    "summary": "Fulfil",
+    "description": "Mark an APPROVED request fulfilled. Either issue from a lot (atomic stock decrement) or confirm - against a real,\nin-date lot - that the need has been met. A request for a reagent that is not in the register is fulfilled by note.",
+    "operationId": "fulfil_api_requests__request_id__fulfil_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "request_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Request Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/FulfilIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RequestDetail"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
   "/api/requests/{request_id}/issue": {
    "post": {
     "tags": [
      "requests"
     ],
     "summary": "Issue",
+    "description": "Approve (if still open) and fulfil from the chosen lot in one transaction; both steps are recorded separately.",
     "operationId": "issue_api_requests__request_id__issue_post",
     "security": [
      {
@@ -2346,6 +3430,32 @@
     ]
    }
   },
+  "/api/dashboard/overview": {
+   "get": {
+    "tags": [
+     "dashboard"
+    ],
+    "summary": "Overview",
+    "operationId": "overview_api_dashboard_overview_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/OverviewOut"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
   "/api/demo/questions": {
    "get": {
     "tags": [
@@ -2375,14 +3485,2909 @@
      }
     ]
    }
+  },
+  "/api/projects": {
+   "post": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "Create Project",
+    "operationId": "create_project_api_projects_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProjectIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "get": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "List Projects",
+    "description": "Only projects the caller is a member of - there is no way to list or search other people's projects.",
+    "operationId": "list_projects_api_projects_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "include_archived",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "boolean",
+       "default": false,
+       "title": "Include Archived"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/ProjectOut"
+         },
+         "title": "Response List Projects Api Projects Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/access-requests/mine": {
+   "get": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "My Access Requests",
+    "operationId": "my_access_requests_api_projects_access_requests_mine_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/AccessRequestOut"
+         },
+         "type": "array",
+         "title": "Response My Access Requests Api Projects Access Requests Mine Get"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/projects/{project_id}": {
+   "get": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "Get Project",
+    "operationId": "get_project_api_projects__project_id__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "patch": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "Update Project",
+    "operationId": "update_project_api_projects__project_id__patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProjectPatch"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "Delete Project",
+    "description": "Permanent. Cascades to experiments + their history, documents, chunks/embeddings, conversations, project memories and\nstored files. The audit trail entry is kept (it holds the id and name only).",
+    "operationId": "delete_project_api_projects__project_id__delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     },
+     {
+      "name": "confirm_name",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "description": "must equal the project name",
+       "title": "Confirm Name"
+      },
+      "description": "must equal the project name"
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/archive": {
+   "post": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "Archive Project",
+    "operationId": "archive_project_api_projects__project_id__archive_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/restore": {
+   "post": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "Restore Project",
+    "operationId": "restore_project_api_projects__project_id__restore_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/password": {
+   "put": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "Set Password",
+    "operationId": "set_password_api_projects__project_id__password_put",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PasswordIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "Clear Password",
+    "operationId": "clear_password_api_projects__project_id__password_delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/members": {
+   "get": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "List Members",
+    "operationId": "list_members_api_projects__project_id__members_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/MemberOut"
+         },
+         "title": "Response List Members Api Projects  Project Id  Members Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "Add Member",
+    "operationId": "add_member_api_projects__project_id__members_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MemberIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MemberOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/members/{user_id}": {
+   "patch": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "Change Member Role",
+    "operationId": "change_member_role_api_projects__project_id__members__user_id__patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "user_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "User Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RoleIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MemberOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "Remove Member",
+    "description": "The owner may revoke anyone; any member may leave. The owner cannot be removed.",
+    "operationId": "remove_member_api_projects__project_id__members__user_id__delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "user_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "User Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/access-requests": {
+   "post": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "Request Access",
+    "description": "Prove knowledge of the project password -> a PENDING request for the owner. Grants nothing by itself.",
+    "operationId": "request_access_api_projects__project_id__access_requests_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AccessRequestIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AccessRequestOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "get": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "List Access Requests",
+    "operationId": "list_access_requests_api_projects__project_id__access_requests_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     },
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "default": "pending",
+       "title": "Status"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/AccessRequestOut"
+         },
+         "title": "Response List Access Requests Api Projects  Project Id  Access Requests Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/access-requests/{request_id}/decision": {
+   "post": {
+    "tags": [
+     "projects"
+    ],
+    "summary": "Decide Access Request",
+    "operationId": "decide_access_request_api_projects__project_id__access_requests__request_id__decision_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "request_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Request Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DecisionIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AccessRequestOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/experiments": {
+   "post": {
+    "tags": [
+     "experiments"
+    ],
+    "summary": "Create Experiment",
+    "operationId": "create_experiment_api_projects__project_id__experiments_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ExperimentCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExperimentOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "get": {
+    "tags": [
+     "experiments"
+    ],
+    "summary": "List Experiments",
+    "operationId": "list_experiments_api_projects__project_id__experiments_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     },
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "maxLength": 200
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Q"
+      }
+     },
+     {
+      "name": "outcome",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Outcome"
+      }
+     },
+     {
+      "name": "tag",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Tag"
+      }
+     },
+     {
+      "name": "parameter",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "maxLength": 120
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Parameter"
+      }
+     },
+     {
+      "name": "date_from",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "format": "date-time"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Date From"
+      }
+     },
+     {
+      "name": "date_to",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "format": "date-time"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Date To"
+      }
+     },
+     {
+      "name": "sort",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "enum": [
+        "performed_at",
+        "created_at",
+        "updated_at",
+        "identifier"
+       ],
+       "type": "string",
+       "default": "performed_at",
+       "title": "Sort"
+      }
+     },
+     {
+      "name": "order",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "enum": [
+        "asc",
+        "desc"
+       ],
+       "type": "string",
+       "default": "desc",
+       "title": "Order"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 100,
+       "minimum": 1,
+       "default": 25,
+       "title": "Limit"
+      }
+     },
+     {
+      "name": "offset",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 0,
+       "default": 0,
+       "title": "Offset"
+      }
+     },
+     {
+      "name": "include_voided",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "boolean",
+       "default": false,
+       "title": "Include Voided"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExperimentPage"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/experiments/parameters": {
+   "get": {
+    "tags": [
+     "experiments"
+    ],
+    "summary": "Parameter Catalog",
+    "operationId": "parameter_catalog_api_projects__project_id__experiments_parameters_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "additionalProperties": true
+         },
+         "title": "Response Parameter Catalog Api Projects  Project Id  Experiments Parameters Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/experiments/{experiment_id}": {
+   "get": {
+    "tags": [
+     "experiments"
+    ],
+    "summary": "Get Experiment",
+    "operationId": "get_experiment_api_projects__project_id__experiments__experiment_id__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "experiment_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Experiment Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExperimentOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "patch": {
+    "tags": [
+     "experiments"
+    ],
+    "summary": "Update Experiment",
+    "operationId": "update_experiment_api_projects__project_id__experiments__experiment_id__patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "experiment_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Experiment Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ExperimentPatch"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExperimentOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "tags": [
+     "experiments"
+    ],
+    "summary": "Void Experiment",
+    "description": "Void (soft delete): history is kept, the record leaves lists, search and the retrieval index.",
+    "operationId": "void_experiment_api_projects__project_id__experiments__experiment_id__delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "experiment_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Experiment Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     },
+     {
+      "name": "reason",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 3,
+       "maxLength": 500,
+       "title": "Reason"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExperimentOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/experiments/{experiment_id}/versions": {
+   "get": {
+    "tags": [
+     "experiments"
+    ],
+    "summary": "List Versions",
+    "operationId": "list_versions_api_projects__project_id__experiments__experiment_id__versions_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "experiment_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Experiment Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/VersionOut"
+         },
+         "title": "Response List Versions Api Projects  Project Id  Experiments  Experiment Id  Versions Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/experiments/{experiment_id}/versions/{version}": {
+   "get": {
+    "tags": [
+     "experiments"
+    ],
+    "summary": "Get Version",
+    "description": "The record exactly as it was at `version` - what a citation in an AI answer points to.",
+    "operationId": "get_version_api_projects__project_id__experiments__experiment_id__versions__version__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "experiment_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Experiment Id"
+      }
+     },
+     {
+      "name": "version",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Version"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/VersionDetail"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/experiments/{experiment_id}/compare": {
+   "get": {
+    "tags": [
+     "experiments"
+    ],
+    "summary": "Compare",
+    "description": "Parameter-by-parameter comparison of two records of this project (both ids are checked against the project).",
+    "operationId": "compare_api_projects__project_id__experiments__experiment_id__compare_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "experiment_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Experiment Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     },
+     {
+      "name": "with",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "With"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/experiments/{experiment_id}/analysis": {
+   "get": {
+    "tags": [
+     "experiments"
+    ],
+    "summary": "Analysis",
+    "description": "Troubleshooting facts computed from the project's own records: unusual values, similar runs, successful-vs-failed\ncontrasts, missing parameters. No model involved; every finding carries experiment ids and versions.",
+    "operationId": "analysis_api_projects__project_id__experiments__experiment_id__analysis_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "experiment_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Experiment Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/documents": {
+   "post": {
+    "tags": [
+     "project documents"
+    ],
+    "summary": "Upload Document",
+    "operationId": "upload_document_api_projects__project_id__documents_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "multipart/form-data": {
+       "schema": {
+        "$ref": "#/components/schemas/Body_upload_document_api_projects__project_id__documents_post"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectDocumentOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "get": {
+    "tags": [
+     "project documents"
+    ],
+    "summary": "List Documents",
+    "description": "`q` matches titles/filenames and the extracted text of the project's own documents.",
+    "operationId": "list_documents_api_projects__project_id__documents_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     },
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "maxLength": 200
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Q"
+      }
+     },
+     {
+      "name": "category",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Category"
+      }
+     },
+     {
+      "name": "file_type",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "File Type"
+      }
+     },
+     {
+      "name": "include_history",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "boolean",
+       "default": false,
+       "title": "Include History"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 100,
+       "minimum": 1,
+       "default": 25,
+       "title": "Limit"
+      }
+     },
+     {
+      "name": "offset",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 0,
+       "default": 0,
+       "title": "Offset"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectDocumentPage"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/documents/{document_id}": {
+   "get": {
+    "tags": [
+     "project documents"
+    ],
+    "summary": "Get Document",
+    "operationId": "get_document_api_projects__project_id__documents__document_id__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "document_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Document Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectDocumentOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "tags": [
+     "project documents"
+    ],
+    "summary": "Delete Document",
+    "description": "Removes the file, the extracted text and every chunk/embedding. A metadata stub stays (status 'deleted') for the audit trail.",
+    "operationId": "delete_document_api_projects__project_id__documents__document_id__delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "document_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Document Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/documents/{document_id}/content": {
+   "get": {
+    "tags": [
+     "project documents"
+    ],
+    "summary": "Get Content",
+    "description": "Extracted text with page numbers (null for formats without pages) - what the index was built from.",
+    "operationId": "get_content_api_projects__project_id__documents__document_id__content_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "document_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Document Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/documents/{document_id}/file": {
+   "get": {
+    "tags": [
+     "project documents"
+    ],
+    "summary": "Download",
+    "operationId": "download_api_projects__project_id__documents__document_id__file_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "document_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Document Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/documents/{document_id}/versions": {
+   "get": {
+    "tags": [
+     "project documents"
+    ],
+    "summary": "Versions",
+    "operationId": "versions_api_projects__project_id__documents__document_id__versions_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "document_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Document Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/ProjectDocumentOut"
+         },
+         "title": "Response Versions Api Projects  Project Id  Documents  Document Id  Versions Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/documents/{document_id}/replace": {
+   "post": {
+    "tags": [
+     "project documents"
+    ],
+    "summary": "Replace Document",
+    "description": "Upload a new version. The old version stays downloadable as history but is removed from retrieval immediately.",
+    "operationId": "replace_document_api_projects__project_id__documents__document_id__replace_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "document_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Document Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "multipart/form-data": {
+       "schema": {
+        "$ref": "#/components/schemas/Body_replace_document_api_projects__project_id__documents__document_id__replace_post"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectDocumentOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/chat/stream": {
+   "post": {
+    "tags": [
+     "project assistant"
+    ],
+    "summary": "Stream",
+    "operationId": "stream_api_projects__project_id__chat_stream_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProjectStreamIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/chat/{chat_id}/external": {
+   "post": {
+    "tags": [
+     "project assistant"
+    ],
+    "summary": "External Decision",
+    "operationId": "external_decision_api_projects__project_id__chat__chat_id__external_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "chat_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Chat Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ExternalDecisionIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/memory": {
+   "get": {
+    "tags": [
+     "project assistant"
+    ],
+    "summary": "List Project Memory",
+    "operationId": "list_project_memory_api_projects__project_id__memory_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/MemoryOut"
+         },
+         "title": "Response List Project Memory Api Projects  Project Id  Memory Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "project assistant"
+    ],
+    "summary": "Add Project Memory",
+    "operationId": "add_project_memory_api_projects__project_id__memory_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MemoryIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MemoryOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/memory/{memory_id}": {
+   "patch": {
+    "tags": [
+     "project assistant"
+    ],
+    "summary": "Edit Project Memory",
+    "operationId": "edit_project_memory_api_projects__project_id__memory__memory_id__patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "memory_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Memory Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MemoryPatch"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MemoryOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "tags": [
+     "project assistant"
+    ],
+    "summary": "Delete Project Memory",
+    "operationId": "delete_project_memory_api_projects__project_id__memory__memory_id__delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "memory_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Memory Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/projects/{project_id}/memory/{memory_id}/confirm": {
+   "post": {
+    "tags": [
+     "project assistant"
+    ],
+    "summary": "Confirm Project Memory",
+    "description": "Mark a stale memory as still valid after checking the changed source.",
+    "operationId": "confirm_project_memory_api_projects__project_id__memory__memory_id__confirm_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "memory_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Memory Id"
+      }
+     },
+     {
+      "name": "project_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Project Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MemoryOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/memory": {
+   "get": {
+    "tags": [
+     "memory"
+    ],
+    "summary": "List User Memory",
+    "operationId": "list_user_memory_api_memory_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/MemoryOut"
+         },
+         "type": "array",
+         "title": "Response List User Memory Api Memory Get"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   },
+   "post": {
+    "tags": [
+     "memory"
+    ],
+    "summary": "Add User Memory",
+    "operationId": "add_user_memory_api_memory_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/UserMemoryIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MemoryOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/memory/{memory_id}": {
+   "patch": {
+    "tags": [
+     "memory"
+    ],
+    "summary": "Edit User Memory",
+    "operationId": "edit_user_memory_api_memory__memory_id__patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "memory_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Memory Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/UserMemoryIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MemoryOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "tags": [
+     "memory"
+    ],
+    "summary": "Delete User Memory",
+    "operationId": "delete_user_memory_api_memory__memory_id__delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "memory_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid",
+       "title": "Memory Id"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
   }
  },
  "components": {
   "schemas": {
+   "AccessRequestIn": {
+    "properties": {
+     "password": {
+      "type": "string",
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Password"
+     },
+     "message": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 500
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Message"
+     }
+    },
+    "type": "object",
+    "required": [
+     "password"
+    ],
+    "title": "AccessRequestIn"
+   },
+   "AccessRequestOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Id"
+     },
+     "project_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Project Id"
+     },
+     "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "User Id"
+     },
+     "username": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Username"
+     },
+     "full_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Full Name"
+     },
+     "project_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Name"
+     },
+     "message": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Message"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "role_granted": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Role Granted"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     },
+     "decided_at": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Decided At"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "project_id",
+     "user_id",
+     "status",
+     "created_at"
+    ],
+    "title": "AccessRequestOut"
+   },
    "AdjustIn": {
     "properties": {
      "new_quantity": {
       "type": "number",
+      "maximum": 1000000000.0,
       "minimum": 0.0,
       "title": "New Quantity"
      },
@@ -2391,6 +6396,18 @@
       "maxLength": 500,
       "minLength": 3,
       "title": "Reason"
+     },
+     "expected_version": {
+      "anyOf": [
+       {
+        "type": "integer",
+        "minimum": 1.0
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Expected Version"
      }
     },
     "type": "object",
@@ -2483,6 +6500,43 @@
     ],
     "title": "AuditOut"
    },
+   "Block": {
+    "properties": {
+     "title": {
+      "type": "string",
+      "title": "Title"
+     },
+     "empty": {
+      "type": "string",
+      "title": "Empty"
+     },
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/Item"
+      },
+      "type": "array",
+      "title": "Items"
+     },
+     "link": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Link"
+     }
+    },
+    "type": "object",
+    "required": [
+     "title",
+     "empty",
+     "items"
+    ],
+    "title": "Block"
+   },
    "Body_extract_api_documents_extract_post": {
     "properties": {
      "file": {
@@ -2510,6 +6564,70 @@
      "file"
     ],
     "title": "Body_read_label_api_inventory_lots_label_post"
+   },
+   "Body_replace_document_api_projects__project_id__documents__document_id__replace_post": {
+    "properties": {
+     "file": {
+      "type": "string",
+      "contentMediaType": "application/octet-stream",
+      "title": "File"
+     },
+     "title": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 240
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Title"
+     }
+    },
+    "type": "object",
+    "required": [
+     "file"
+    ],
+    "title": "Body_replace_document_api_projects__project_id__documents__document_id__replace_post"
+   },
+   "Body_upload_document_api_projects__project_id__documents_post": {
+    "properties": {
+     "file": {
+      "type": "string",
+      "contentMediaType": "application/octet-stream",
+      "title": "File"
+     },
+     "title": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 240
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Title"
+     },
+     "category": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 80
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Category"
+     }
+    },
+    "type": "object",
+    "required": [
+     "file"
+    ],
+    "title": "Body_upload_document_api_projects__project_id__documents_post"
    },
    "Card": {
     "properties": {
@@ -2539,6 +6657,140 @@
      "value"
     ],
     "title": "Card"
+   },
+   "Chart": {
+    "properties": {
+     "title": {
+      "type": "string",
+      "title": "Title"
+     },
+     "kind": {
+      "type": "string",
+      "title": "Kind"
+     },
+     "data": {
+      "items": {
+       "$ref": "#/components/schemas/Slice"
+      },
+      "type": "array",
+      "title": "Data"
+     }
+    },
+    "type": "object",
+    "required": [
+     "title",
+     "kind",
+     "data"
+    ],
+    "title": "Chart"
+   },
+   "CommentIn": {
+    "properties": {
+     "comment": {
+      "type": "string",
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Comment"
+     }
+    },
+    "type": "object",
+    "required": [
+     "comment"
+    ],
+    "title": "CommentIn"
+   },
+   "ConversationMemoryOut": {
+    "properties": {
+     "summary": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Summary"
+     },
+     "summary_stale": {
+      "type": "boolean",
+      "title": "Summary Stale"
+     },
+     "summarised_turns": {
+      "type": "integer",
+      "title": "Summarised Turns"
+     },
+     "external_allowed": {
+      "type": "boolean",
+      "title": "External Allowed"
+     },
+     "note": {
+      "type": "string",
+      "title": "Note",
+      "default": "AI-generated summary of earlier turns. It is context for the assistant, not a verified record."
+     }
+    },
+    "type": "object",
+    "required": [
+     "summary",
+     "summary_stale",
+     "summarised_turns",
+     "external_allowed"
+    ],
+    "title": "ConversationMemoryOut"
+   },
+   "ConversationOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Id"
+     },
+     "title": {
+      "type": "string",
+      "title": "Title"
+     },
+     "last_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Last At"
+     },
+     "turns": {
+      "type": "integer",
+      "title": "Turns"
+     },
+     "project_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Id"
+     },
+     "project_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Name"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "title",
+     "last_at",
+     "turns"
+    ],
+    "title": "ConversationOut"
    },
    "DashboardOut": {
     "properties": {
@@ -2576,6 +6828,28 @@
      "cards"
     ],
     "title": "DashboardOut"
+   },
+   "DecisionIn": {
+    "properties": {
+     "approve": {
+      "type": "boolean",
+      "title": "Approve"
+     },
+     "role": {
+      "type": "string",
+      "enum": [
+       "viewer",
+       "editor"
+      ],
+      "title": "Role",
+      "default": "viewer"
+     }
+    },
+    "type": "object",
+    "required": [
+     "approve"
+    ],
+    "title": "DecisionIn"
    },
    "DemoQuestion": {
     "properties": {
@@ -2970,12 +7244,858 @@
     ],
     "title": "DocumentOut"
    },
+   "Equipment": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Name"
+     },
+     "id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 80
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name"
+    ],
+    "title": "Equipment"
+   },
+   "EventOut": {
+    "properties": {
+     "id": {
+      "type": "integer",
+      "title": "Id"
+     },
+     "kind": {
+      "type": "string",
+      "title": "Kind"
+     },
+     "from_status": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "From Status"
+     },
+     "to_status": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "To Status"
+     },
+     "actor_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Actor Id"
+     },
+     "actor_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Actor Name"
+     },
+     "actor_role": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Actor Role"
+     },
+     "comment": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Comment"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "kind",
+     "actor_id",
+     "created_at"
+    ],
+    "title": "EventOut"
+   },
+   "ExperimentCreate": {
+    "properties": {
+     "title": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Title"
+     },
+     "performed_at": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Performed At"
+     },
+     "objective": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 8000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Objective"
+     },
+     "reagents": {
+      "items": {
+       "$ref": "#/components/schemas/ReagentUse"
+      },
+      "type": "array",
+      "maxItems": 200,
+      "title": "Reagents"
+     },
+     "equipment": {
+      "items": {
+       "$ref": "#/components/schemas/Equipment"
+      },
+      "type": "array",
+      "maxItems": 100,
+      "title": "Equipment"
+     },
+     "materials": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "maxItems": 200,
+      "title": "Materials"
+     },
+     "parameters": {
+      "items": {
+       "$ref": "#/components/schemas/Param"
+      },
+      "type": "array",
+      "maxItems": 500,
+      "title": "Parameters"
+     },
+     "conditions": {
+      "additionalProperties": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        },
+        {
+         "type": "number"
+        },
+        {
+         "type": "boolean"
+        }
+       ]
+      },
+      "type": "object",
+      "title": "Conditions"
+     },
+     "custom_fields": {
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Custom Fields"
+     },
+     "procedure_refs": {
+      "items": {
+       "$ref": "#/components/schemas/ProcedureRef"
+      },
+      "type": "array",
+      "maxItems": 100,
+      "title": "Procedure Refs"
+     },
+     "observations": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 40000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Observations"
+     },
+     "results": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 40000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Results"
+     },
+     "conclusions": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 40000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Conclusions"
+     },
+     "outcome": {
+      "type": "string",
+      "enum": [
+       "success",
+       "failure",
+       "inconclusive",
+       "unknown"
+      ],
+      "title": "Outcome",
+      "default": "unknown"
+     },
+     "tags": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "maxItems": 30,
+      "title": "Tags"
+     },
+     "links": {
+      "items": {
+       "$ref": "#/components/schemas/Link"
+      },
+      "type": "array",
+      "maxItems": 100,
+      "title": "Links"
+     },
+     "attachments": {
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "type": "array",
+      "maxItems": 100,
+      "title": "Attachments"
+     },
+     "identifier": {
+      "type": "string",
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Identifier"
+     }
+    },
+    "type": "object",
+    "required": [
+     "title",
+     "identifier"
+    ],
+    "title": "ExperimentCreate"
+   },
+   "ExperimentOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Id"
+     },
+     "project_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Project Id"
+     },
+     "identifier": {
+      "type": "string",
+      "title": "Identifier"
+     },
+     "title": {
+      "type": "string",
+      "title": "Title"
+     },
+     "performed_at": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Performed At"
+     },
+     "objective": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Objective"
+     },
+     "reagents": {
+      "items": {},
+      "type": "array",
+      "title": "Reagents"
+     },
+     "equipment": {
+      "items": {},
+      "type": "array",
+      "title": "Equipment"
+     },
+     "materials": {
+      "items": {},
+      "type": "array",
+      "title": "Materials"
+     },
+     "parameters": {
+      "items": {},
+      "type": "array",
+      "title": "Parameters"
+     },
+     "conditions": {
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Conditions"
+     },
+     "custom_fields": {
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Custom Fields"
+     },
+     "procedure_refs": {
+      "items": {},
+      "type": "array",
+      "title": "Procedure Refs"
+     },
+     "observations": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Observations"
+     },
+     "results": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Results"
+     },
+     "conclusions": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Conclusions"
+     },
+     "outcome": {
+      "type": "string",
+      "title": "Outcome"
+     },
+     "tags": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Tags"
+     },
+     "links": {
+      "items": {},
+      "type": "array",
+      "title": "Links"
+     },
+     "attachments": {
+      "items": {},
+      "type": "array",
+      "title": "Attachments"
+     },
+     "version": {
+      "type": "integer",
+      "title": "Version"
+     },
+     "created_by": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Created By"
+     },
+     "created_by_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Created By Name"
+     },
+     "updated_by": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Updated By"
+     },
+     "updated_by_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Updated By Name"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     },
+     "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Updated At"
+     },
+     "voided_at": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Voided At"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "project_id",
+     "identifier",
+     "title",
+     "performed_at",
+     "objective",
+     "reagents",
+     "equipment",
+     "materials",
+     "parameters",
+     "conditions",
+     "custom_fields",
+     "procedure_refs",
+     "observations",
+     "results",
+     "conclusions",
+     "outcome",
+     "tags",
+     "links",
+     "attachments",
+     "version",
+     "created_by",
+     "updated_by",
+     "created_at",
+     "updated_at"
+    ],
+    "title": "ExperimentOut"
+   },
+   "ExperimentPage": {
+    "properties": {
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/ExperimentOut"
+      },
+      "type": "array",
+      "title": "Items"
+     },
+     "total": {
+      "type": "integer",
+      "title": "Total"
+     },
+     "limit": {
+      "type": "integer",
+      "title": "Limit"
+     },
+     "offset": {
+      "type": "integer",
+      "title": "Offset"
+     }
+    },
+    "type": "object",
+    "required": [
+     "items",
+     "total",
+     "limit",
+     "offset"
+    ],
+    "title": "ExperimentPage"
+   },
+   "ExperimentPatch": {
+    "properties": {
+     "expected_version": {
+      "type": "integer",
+      "minimum": 1.0,
+      "title": "Expected Version"
+     },
+     "change_note": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 500
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Change Note"
+     },
+     "title": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Title"
+     },
+     "performed_at": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Performed At"
+     },
+     "objective": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 8000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Objective"
+     },
+     "reagents": {
+      "anyOf": [
+       {
+        "items": {
+         "$ref": "#/components/schemas/ReagentUse"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reagents"
+     },
+     "equipment": {
+      "anyOf": [
+       {
+        "items": {
+         "$ref": "#/components/schemas/Equipment"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Equipment"
+     },
+     "materials": {
+      "anyOf": [
+       {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Materials"
+     },
+     "parameters": {
+      "anyOf": [
+       {
+        "items": {
+         "$ref": "#/components/schemas/Param"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Parameters"
+     },
+     "conditions": {
+      "anyOf": [
+       {
+        "additionalProperties": {
+         "anyOf": [
+          {
+           "type": "string"
+          },
+          {
+           "type": "integer"
+          },
+          {
+           "type": "number"
+          },
+          {
+           "type": "boolean"
+          }
+         ]
+        },
+        "type": "object"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Conditions"
+     },
+     "custom_fields": {
+      "anyOf": [
+       {
+        "additionalProperties": true,
+        "type": "object"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Custom Fields"
+     },
+     "procedure_refs": {
+      "anyOf": [
+       {
+        "items": {
+         "$ref": "#/components/schemas/ProcedureRef"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Procedure Refs"
+     },
+     "observations": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 40000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Observations"
+     },
+     "results": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 40000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Results"
+     },
+     "conclusions": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 40000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Conclusions"
+     },
+     "outcome": {
+      "anyOf": [
+       {
+        "type": "string",
+        "enum": [
+         "success",
+         "failure",
+         "inconclusive",
+         "unknown"
+        ]
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Outcome"
+     },
+     "tags": {
+      "anyOf": [
+       {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tags"
+     },
+     "links": {
+      "anyOf": [
+       {
+        "items": {
+         "$ref": "#/components/schemas/Link"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Links"
+     },
+     "attachments": {
+      "anyOf": [
+       {
+        "items": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Attachments"
+     }
+    },
+    "type": "object",
+    "required": [
+     "expected_version"
+    ],
+    "title": "ExperimentPatch",
+    "description": "Partial update. `expected_version` is mandatory: it is the version the editor was looking at."
+   },
+   "ExternalDecisionIn": {
+    "properties": {
+     "decision": {
+      "type": "string",
+      "enum": [
+       "allow_once",
+       "allow_conversation",
+       "deny"
+      ],
+      "title": "Decision"
+     }
+    },
+    "type": "object",
+    "required": [
+     "decision"
+    ],
+    "title": "ExternalDecisionIn"
+   },
    "ExternalIn": {
     "properties": {
      "gap_id": {
       "type": "string",
       "format": "uuid",
       "title": "Gap Id"
+     },
+     "conversation_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Conversation Id"
      }
     },
     "type": "object",
@@ -3038,6 +8158,38 @@
      "feedback"
     ],
     "title": "FeedbackIn"
+   },
+   "FulfilIn": {
+    "properties": {
+     "note": {
+      "type": "string",
+      "maxLength": 2000,
+      "minLength": 3,
+      "title": "Note"
+     },
+     "lot_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Lot Id"
+     },
+     "issue_from_lot": {
+      "type": "boolean",
+      "title": "Issue From Lot",
+      "default": false
+     }
+    },
+    "type": "object",
+    "required": [
+     "note"
+    ],
+    "title": "FulfilIn"
    },
    "GapOut": {
     "properties": {
@@ -3214,6 +8366,36 @@
       ],
       "title": "Feedback"
      },
+     "conversation_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Conversation Id"
+     },
+     "project_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Id"
+     },
+     "meta": {
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Meta",
+      "default": {}
+     },
      "created_at": {
       "type": "string",
       "format": "date-time",
@@ -3245,6 +8427,57 @@
      "lot_id"
     ],
     "title": "IssueIn"
+   },
+   "Item": {
+    "properties": {
+     "primary": {
+      "type": "string",
+      "title": "Primary"
+     },
+     "secondary": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Secondary"
+     },
+     "badge": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Badge"
+     },
+     "tone": {
+      "type": "string",
+      "title": "Tone",
+      "default": "slate"
+     },
+     "link": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Link"
+     }
+    },
+    "type": "object",
+    "required": [
+     "primary"
+    ],
+    "title": "Item"
    },
    "JobCreated": {
     "properties": {
@@ -3363,6 +8596,30 @@
     },
     "type": "object",
     "title": "LabelOut"
+   },
+   "Link": {
+    "properties": {
+     "experiment_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Experiment Id"
+     },
+     "relation": {
+      "type": "string",
+      "enum": [
+       "previous",
+       "next",
+       "related"
+      ],
+      "title": "Relation",
+      "default": "related"
+     }
+    },
+    "type": "object",
+    "required": [
+     "experiment_id"
+    ],
+    "title": "Link"
    },
    "LinkIn": {
     "properties": {
@@ -3735,6 +8992,26 @@
        }
       ],
       "title": "Days Remaining"
+     },
+     "reserved_quantity": {
+      "type": "number",
+      "title": "Reserved Quantity",
+      "default": 0
+     },
+     "usable_quantity": {
+      "type": "number",
+      "title": "Usable Quantity",
+      "default": 0
+     },
+     "availability": {
+      "type": "string",
+      "title": "Availability",
+      "default": "active"
+     },
+     "row_version": {
+      "type": "integer",
+      "title": "Row Version",
+      "default": 1
      }
     },
     "type": "object",
@@ -3748,6 +9025,87 @@
      "status"
     ],
     "title": "LotOut"
+   },
+   "LotPatch": {
+    "properties": {
+     "expected_version": {
+      "type": "integer",
+      "minimum": 1.0,
+      "title": "Expected Version"
+     },
+     "reason": {
+      "type": "string",
+      "maxLength": 500,
+      "minLength": 3,
+      "title": "Reason"
+     },
+     "lot_no": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 80,
+        "minLength": 1
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Lot No"
+     },
+     "expiry_date": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Expiry Date"
+     },
+     "location": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 120
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Location"
+     },
+     "storage_conditions": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Storage Conditions"
+     },
+     "availability": {
+      "anyOf": [
+       {
+        "type": "string",
+        "pattern": "^(active|quarantined|unavailable)$"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Availability"
+     }
+    },
+    "type": "object",
+    "required": [
+     "expected_version",
+     "reason"
+    ],
+    "title": "LotPatch"
    },
    "MeOut": {
     "properties": {
@@ -3768,6 +9126,222 @@
      "permissions"
     ],
     "title": "MeOut"
+   },
+   "MemberIn": {
+    "properties": {
+     "username": {
+      "type": "string",
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Username"
+     },
+     "role": {
+      "type": "string",
+      "enum": [
+       "viewer",
+       "editor"
+      ],
+      "title": "Role"
+     }
+    },
+    "type": "object",
+    "required": [
+     "username",
+     "role"
+    ],
+    "title": "MemberIn"
+   },
+   "MemberOut": {
+    "properties": {
+     "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "User Id"
+     },
+     "username": {
+      "type": "string",
+      "title": "Username"
+     },
+     "full_name": {
+      "type": "string",
+      "title": "Full Name"
+     },
+     "role": {
+      "type": "string",
+      "title": "Role"
+     },
+     "added_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Added At"
+     }
+    },
+    "type": "object",
+    "required": [
+     "user_id",
+     "username",
+     "full_name",
+     "role",
+     "added_at"
+    ],
+    "title": "MemberOut"
+   },
+   "MemoryIn": {
+    "properties": {
+     "content": {
+      "type": "string",
+      "maxLength": 1000,
+      "minLength": 2,
+      "title": "Content"
+     },
+     "kind": {
+      "type": "string",
+      "enum": [
+       "terminology",
+       "finding",
+       "note"
+      ],
+      "title": "Kind",
+      "default": "note"
+     },
+     "origin": {
+      "type": "string",
+      "enum": [
+       "user",
+       "ai_suggested"
+      ],
+      "title": "Origin",
+      "default": "user"
+     },
+     "source_refs": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "type": "array",
+      "maxItems": 10,
+      "title": "Source Refs"
+     }
+    },
+    "type": "object",
+    "required": [
+     "content"
+    ],
+    "title": "MemoryIn"
+   },
+   "MemoryOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Id"
+     },
+     "scope": {
+      "type": "string",
+      "title": "Scope"
+     },
+     "kind": {
+      "type": "string",
+      "title": "Kind"
+     },
+     "content": {
+      "type": "string",
+      "title": "Content"
+     },
+     "origin": {
+      "type": "string",
+      "title": "Origin"
+     },
+     "stale": {
+      "type": "boolean",
+      "title": "Stale"
+     },
+     "source_refs": {
+      "items": {},
+      "type": "array",
+      "title": "Source Refs"
+     },
+     "author_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Author Id"
+     },
+     "author_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Author Name"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     },
+     "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Updated At"
+     },
+     "verified": {
+      "type": "boolean",
+      "title": "Verified",
+      "default": false
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "scope",
+     "kind",
+     "content",
+     "origin",
+     "stale",
+     "source_refs",
+     "author_id",
+     "created_at",
+     "updated_at"
+    ],
+    "title": "MemoryOut"
+   },
+   "MemoryPatch": {
+    "properties": {
+     "content": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 1000,
+        "minLength": 2
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Content"
+     },
+     "kind": {
+      "anyOf": [
+       {
+        "type": "string",
+        "enum": [
+         "terminology",
+         "finding",
+         "note"
+        ]
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Kind"
+     }
+    },
+    "type": "object",
+    "title": "MemoryPatch"
    },
    "MessageIn": {
     "properties": {
@@ -3790,6 +9364,17 @@
       "type": "string",
       "format": "uuid",
       "title": "Id"
+     },
+     "kind": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Kind"
      },
      "message": {
       "type": "string",
@@ -3825,6 +9410,635 @@
      "created_at"
     ],
     "title": "NotificationOut"
+   },
+   "OverviewOut": {
+    "properties": {
+     "role": {
+      "type": "string",
+      "title": "Role"
+     },
+     "headline": {
+      "type": "string",
+      "title": "Headline"
+     },
+     "subtitle": {
+      "type": "string",
+      "title": "Subtitle"
+     },
+     "stats": {
+      "items": {
+       "$ref": "#/components/schemas/Stat"
+      },
+      "type": "array",
+      "title": "Stats"
+     },
+     "charts": {
+      "items": {
+       "$ref": "#/components/schemas/Chart"
+      },
+      "type": "array",
+      "title": "Charts"
+     },
+     "blocks": {
+      "items": {
+       "$ref": "#/components/schemas/Block"
+      },
+      "type": "array",
+      "title": "Blocks"
+     }
+    },
+    "type": "object",
+    "required": [
+     "role",
+     "headline",
+     "subtitle",
+     "stats",
+     "charts",
+     "blocks"
+    ],
+    "title": "OverviewOut"
+   },
+   "Param": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Name"
+     },
+     "value": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Value"
+     },
+     "text_value": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 300
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Text Value"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 20
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 300
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name"
+    ],
+    "title": "Param"
+   },
+   "PasswordIn": {
+    "properties": {
+     "password": {
+      "type": "string",
+      "maxLength": 128,
+      "minLength": 8,
+      "title": "Password"
+     }
+    },
+    "type": "object",
+    "required": [
+     "password"
+    ],
+    "title": "PasswordIn"
+   },
+   "ProcedureRef": {
+    "properties": {
+     "document_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Document Id"
+     },
+     "text": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 500
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Text"
+     }
+    },
+    "type": "object",
+    "title": "ProcedureRef"
+   },
+   "ProjectAnswerIn": {
+    "properties": {
+     "question": {
+      "type": "string",
+      "maxLength": 2000,
+      "minLength": 2,
+      "title": "Question"
+     },
+     "project_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Project Id"
+     },
+     "conversation_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Conversation Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "question",
+     "project_id"
+    ],
+    "title": "ProjectAnswerIn"
+   },
+   "ProjectDocumentOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Id"
+     },
+     "project_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Project Id"
+     },
+     "lineage_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Lineage Id"
+     },
+     "version": {
+      "type": "integer",
+      "title": "Version"
+     },
+     "title": {
+      "type": "string",
+      "title": "Title"
+     },
+     "category": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Category"
+     },
+     "filename": {
+      "type": "string",
+      "title": "Filename"
+     },
+     "file_type": {
+      "type": "string",
+      "title": "File Type"
+     },
+     "size_bytes": {
+      "type": "integer",
+      "title": "Size Bytes"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "page_count": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Page Count"
+     },
+     "char_count": {
+      "type": "integer",
+      "title": "Char Count",
+      "default": 0
+     },
+     "chunks": {
+      "type": "integer",
+      "title": "Chunks",
+      "default": 0
+     },
+     "warnings": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Warnings",
+      "default": []
+     },
+     "uploaded_by": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Uploaded By"
+     },
+     "uploaded_by_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Uploaded By Name"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "project_id",
+     "lineage_id",
+     "version",
+     "title",
+     "filename",
+     "file_type",
+     "size_bytes",
+     "status",
+     "uploaded_by",
+     "created_at"
+    ],
+    "title": "ProjectDocumentOut"
+   },
+   "ProjectDocumentPage": {
+    "properties": {
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/ProjectDocumentOut"
+      },
+      "type": "array",
+      "title": "Items"
+     },
+     "total": {
+      "type": "integer",
+      "title": "Total"
+     },
+     "limit": {
+      "type": "integer",
+      "title": "Limit"
+     },
+     "offset": {
+      "type": "integer",
+      "title": "Offset"
+     }
+    },
+    "type": "object",
+    "required": [
+     "items",
+     "total",
+     "limit",
+     "offset"
+    ],
+    "title": "ProjectDocumentPage"
+   },
+   "ProjectIn": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "maxLength": 160,
+      "minLength": 2,
+      "title": "Name"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 4000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "objectives": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 4000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Objectives"
+     },
+     "domain": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 80
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Domain"
+     },
+     "tags": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Tags",
+      "default": []
+     },
+     "password": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 128,
+        "minLength": 8
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Password"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name"
+    ],
+    "title": "ProjectIn"
+   },
+   "ProjectOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Id"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "objectives": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Objectives"
+     },
+     "domain": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Domain"
+     },
+     "tags": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Tags",
+      "default": []
+     },
+     "owner_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Owner Id"
+     },
+     "owner_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Owner Name"
+     },
+     "role": {
+      "type": "string",
+      "title": "Role"
+     },
+     "archived": {
+      "type": "boolean",
+      "title": "Archived"
+     },
+     "has_password": {
+      "type": "boolean",
+      "title": "Has Password"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     },
+     "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Updated At"
+     },
+     "experiments": {
+      "type": "integer",
+      "title": "Experiments",
+      "default": 0
+     },
+     "documents": {
+      "type": "integer",
+      "title": "Documents",
+      "default": 0
+     },
+     "members": {
+      "type": "integer",
+      "title": "Members",
+      "default": 0
+     },
+     "pending_access_requests": {
+      "type": "integer",
+      "title": "Pending Access Requests",
+      "default": 0
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "name",
+     "owner_id",
+     "role",
+     "archived",
+     "has_password",
+     "created_at",
+     "updated_at"
+    ],
+    "title": "ProjectOut"
+   },
+   "ProjectPatch": {
+    "properties": {
+     "name": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 160,
+        "minLength": 2
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 4000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "objectives": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 4000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Objectives"
+     },
+     "domain": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 80
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Domain"
+     },
+     "tags": {
+      "anyOf": [
+       {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tags"
+     }
+    },
+    "type": "object",
+    "title": "ProjectPatch"
+   },
+   "ProjectStreamIn": {
+    "properties": {
+     "question": {
+      "type": "string",
+      "maxLength": 2000,
+      "minLength": 2,
+      "title": "Question"
+     },
+     "conversation_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Conversation Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "question"
+    ],
+    "title": "ProjectStreamIn"
    },
    "PublishIn": {
     "properties": {
@@ -3959,6 +10173,226 @@
     ],
     "title": "ReagentOut"
    },
+   "ReagentSummaryOut": {
+    "properties": {
+     "reagent_id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Reagent Id"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "cas_number": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Cas Number"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     },
+     "reorder_level": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reorder Level"
+     },
+     "storage_conditions": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Storage Conditions"
+     },
+     "hazard_classes": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Hazard Classes",
+      "default": []
+     },
+     "physical_quantity": {
+      "type": "number",
+      "title": "Physical Quantity"
+     },
+     "usable_quantity": {
+      "type": "number",
+      "title": "Usable Quantity"
+     },
+     "reserved_quantity": {
+      "type": "number",
+      "title": "Reserved Quantity"
+     },
+     "expired_quantity": {
+      "type": "number",
+      "title": "Expired Quantity"
+     },
+     "unavailable_quantity": {
+      "type": "number",
+      "title": "Unavailable Quantity"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "status_label": {
+      "type": "string",
+      "title": "Status Label"
+     },
+     "lots": {
+      "type": "integer",
+      "title": "Lots"
+     },
+     "nearest_usable_expiry": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Nearest Usable Expiry"
+     }
+    },
+    "type": "object",
+    "required": [
+     "reagent_id",
+     "name",
+     "physical_quantity",
+     "usable_quantity",
+     "reserved_quantity",
+     "expired_quantity",
+     "unavailable_quantity",
+     "status",
+     "status_label",
+     "lots"
+    ],
+    "title": "ReagentSummaryOut"
+   },
+   "ReagentUse": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Name"
+     },
+     "reagent_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reagent Id"
+     },
+     "lot_no": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 80
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Lot No"
+     },
+     "quantity": {
+      "anyOf": [
+       {
+        "type": "number",
+        "minimum": 0.0
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Quantity"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 16
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name"
+    ],
+    "title": "ReagentUse"
+   },
+   "ReceiveIn": {
+    "properties": {
+     "quantity": {
+      "type": "number",
+      "maximum": 1000000000.0,
+      "exclusiveMinimum": 0.0,
+      "title": "Quantity"
+     },
+     "reason": {
+      "type": "string",
+      "maxLength": 500,
+      "minLength": 3,
+      "title": "Reason"
+     },
+     "expiry_date": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Expiry Date"
+     }
+    },
+    "type": "object",
+    "required": [
+     "quantity",
+     "reason"
+    ],
+    "title": "ReceiveIn"
+   },
    "RejectIn": {
     "properties": {
      "reason": {
@@ -3974,51 +10408,22 @@
     ],
     "title": "RejectIn"
    },
-   "RequestIn": {
+   "RenameIn": {
     "properties": {
-     "reagent_id": {
+     "title": {
       "type": "string",
-      "format": "uuid",
-      "title": "Reagent Id"
-     },
-     "quantity": {
-      "type": "number",
-      "exclusiveMinimum": 0.0,
-      "title": "Quantity"
-     },
-     "purpose": {
-      "anyOf": [
-       {
-        "type": "string",
-        "maxLength": 1000
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Purpose"
-     },
-     "experiment_ref": {
-      "anyOf": [
-       {
-        "type": "string",
-        "maxLength": 120
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Experiment Ref"
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Title"
      }
     },
     "type": "object",
     "required": [
-     "reagent_id",
-     "quantity"
+     "title"
     ],
-    "title": "RequestIn"
+    "title": "RenameIn"
    },
-   "RequestOut": {
+   "RequestDetail": {
     "properties": {
      "id": {
       "type": "string",
@@ -4026,13 +10431,25 @@
       "title": "Id"
      },
      "reagent_id": {
-      "type": "string",
-      "format": "uuid",
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
       "title": "Reagent Id"
      },
      "reagent_name": {
       "type": "string",
       "title": "Reagent Name"
+     },
+     "in_register": {
+      "type": "boolean",
+      "title": "In Register",
+      "default": true
      },
      "unit": {
       "anyOf": [
@@ -4060,6 +10477,22 @@
       ],
       "title": "Purpose"
      },
+     "details": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Details"
+     },
+     "urgency": {
+      "type": "string",
+      "title": "Urgency",
+      "default": "normal"
+     },
      "experiment_ref": {
       "anyOf": [
        {
@@ -4070,6 +10503,29 @@
        }
       ],
       "title": "Experiment Ref"
+     },
+     "project_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Id"
+     },
+     "project_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Name"
      },
      "status": {
       "type": "string",
@@ -4102,6 +10558,17 @@
       ],
       "title": "Requester Name"
      },
+     "handler_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Handler Name"
+     },
      "issued_lot_id": {
       "anyOf": [
        {
@@ -4113,6 +10580,56 @@
        }
       ],
       "title": "Issued Lot Id"
+     },
+     "reserved_lot_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reserved Lot Id"
+     },
+     "reserved_quantity": {
+      "type": "number",
+      "title": "Reserved Quantity",
+      "default": 0
+     },
+     "fulfilment_note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Fulfilment Note"
+     },
+     "reagent_availability": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reagent Availability"
+     },
+     "reagent_availability_label": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reagent Availability Label"
      },
      "created_at": {
       "type": "string",
@@ -4130,12 +10647,388 @@
        }
       ],
       "title": "Handled At"
+     },
+     "fulfilled_at": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Fulfilled At"
+     },
+     "events": {
+      "items": {
+       "$ref": "#/components/schemas/EventOut"
+      },
+      "type": "array",
+      "title": "Events"
+     },
+     "allowed_next": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Allowed Next",
+      "default": []
      }
     },
     "type": "object",
     "required": [
      "id",
-     "reagent_id",
+     "reagent_name",
+     "quantity",
+     "status",
+     "requested_by",
+     "created_at",
+     "events"
+    ],
+    "title": "RequestDetail"
+   },
+   "RequestIn": {
+    "properties": {
+     "reagent_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reagent Id"
+     },
+     "reagent_name": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 200
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reagent Name"
+     },
+     "quantity": {
+      "type": "number",
+      "maximum": 10000000.0,
+      "exclusiveMinimum": 0.0,
+      "title": "Quantity"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 16
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     },
+     "reason": {
+      "type": "string",
+      "maxLength": 1000,
+      "minLength": 3,
+      "title": "Reason"
+     },
+     "details": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 4000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Details"
+     },
+     "urgency": {
+      "type": "string",
+      "pattern": "^(low|normal|high|urgent)$",
+      "title": "Urgency",
+      "default": "normal"
+     },
+     "project_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Id"
+     },
+     "experiment_ref": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 120
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Experiment Ref"
+     }
+    },
+    "type": "object",
+    "required": [
+     "quantity",
+     "reason"
+    ],
+    "title": "RequestIn"
+   },
+   "RequestOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Id"
+     },
+     "reagent_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reagent Id"
+     },
+     "reagent_name": {
+      "type": "string",
+      "title": "Reagent Name"
+     },
+     "in_register": {
+      "type": "boolean",
+      "title": "In Register",
+      "default": true
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     },
+     "quantity": {
+      "type": "number",
+      "title": "Quantity"
+     },
+     "purpose": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Purpose"
+     },
+     "details": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Details"
+     },
+     "urgency": {
+      "type": "string",
+      "title": "Urgency",
+      "default": "normal"
+     },
+     "experiment_ref": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Experiment Ref"
+     },
+     "project_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Id"
+     },
+     "project_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Name"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "reject_reason": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reject Reason"
+     },
+     "requested_by": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Requested By"
+     },
+     "requester_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Requester Name"
+     },
+     "handler_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Handler Name"
+     },
+     "issued_lot_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Issued Lot Id"
+     },
+     "reserved_lot_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reserved Lot Id"
+     },
+     "reserved_quantity": {
+      "type": "number",
+      "title": "Reserved Quantity",
+      "default": 0
+     },
+     "fulfilment_note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Fulfilment Note"
+     },
+     "reagent_availability": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reagent Availability"
+     },
+     "reagent_availability_label": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reagent Availability Label"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     },
+     "handled_at": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Handled At"
+     },
+     "fulfilled_at": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Fulfilled At"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
      "reagent_name",
      "quantity",
      "status",
@@ -4143,6 +11036,52 @@
      "created_at"
     ],
     "title": "RequestOut"
+   },
+   "RequestPage": {
+    "properties": {
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/RequestOut"
+      },
+      "type": "array",
+      "title": "Items"
+     },
+     "total": {
+      "type": "integer",
+      "title": "Total"
+     },
+     "limit": {
+      "type": "integer",
+      "title": "Limit"
+     },
+     "offset": {
+      "type": "integer",
+      "title": "Offset"
+     }
+    },
+    "type": "object",
+    "required": [
+     "items",
+     "total",
+     "limit",
+     "offset"
+    ],
+    "title": "RequestPage"
+   },
+   "RespondIn": {
+    "properties": {
+     "comment": {
+      "type": "string",
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Comment"
+     }
+    },
+    "type": "object",
+    "required": [
+     "comment"
+    ],
+    "title": "RespondIn"
    },
    "RetireIn": {
     "properties": {
@@ -4183,6 +11122,23 @@
      "quantity"
     ],
     "title": "ReturnIn"
+   },
+   "RoleIn": {
+    "properties": {
+     "role": {
+      "type": "string",
+      "enum": [
+       "viewer",
+       "editor"
+      ],
+      "title": "Role"
+     }
+    },
+    "type": "object",
+    "required": [
+     "role"
+    ],
+    "title": "RoleIn"
    },
    "RoleUpdate": {
     "properties": {
@@ -4254,6 +11210,58 @@
      "narration"
     ],
     "title": "StartIn"
+   },
+   "Stat": {
+    "properties": {
+     "label": {
+      "type": "string",
+      "title": "Label"
+     },
+     "value": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "string"
+       }
+      ],
+      "title": "Value"
+     },
+     "hint": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Hint"
+     },
+     "link": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Link"
+     },
+     "tone": {
+      "type": "string",
+      "title": "Tone",
+      "default": "blue"
+     }
+    },
+    "type": "object",
+    "required": [
+     "label",
+     "value"
+    ],
+    "title": "Stat"
    },
    "StepIn": {
     "properties": {
@@ -4362,6 +11370,32 @@
       "type": "array",
       "title": "History",
       "default": []
+     },
+     "conversation_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Conversation Id"
+     },
+     "mode": {
+      "type": "string",
+      "enum": [
+       "strict",
+       "assistant"
+      ],
+      "title": "Mode",
+      "default": "strict"
+     },
+     "project_check": {
+      "type": "boolean",
+      "title": "Project Check",
+      "default": true
      }
     },
     "type": "object",
@@ -4398,6 +11432,56 @@
      "chunk_id"
     ],
     "title": "TextSection"
+   },
+   "TransitionIn": {
+    "properties": {
+     "to_status": {
+      "type": "string",
+      "title": "To Status"
+     },
+     "comment": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 2000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Comment"
+     },
+     "reserve_lot_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "uuid"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reserve Lot Id"
+     },
+     "reserve_quantity": {
+      "anyOf": [
+       {
+        "type": "number",
+        "maximum": 10000000.0,
+        "exclusiveMinimum": 0.0
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reserve Quantity"
+     }
+    },
+    "type": "object",
+    "required": [
+     "to_status"
+    ],
+    "title": "TransitionIn"
    },
    "Turn": {
     "properties": {
@@ -4473,6 +11557,21 @@
      "role"
     ],
     "title": "UserCreate"
+   },
+   "UserMemoryIn": {
+    "properties": {
+     "content": {
+      "type": "string",
+      "maxLength": 1000,
+      "minLength": 2,
+      "title": "Content"
+     }
+    },
+    "type": "object",
+    "required": [
+     "content"
+    ],
+    "title": "UserMemoryIn"
    },
    "UserOut": {
     "properties": {
@@ -4589,6 +11688,124 @@
      "first_broken_id"
     ],
     "title": "VerifyOut"
+   },
+   "VersionDetail": {
+    "properties": {
+     "version": {
+      "type": "integer",
+      "title": "Version"
+     },
+     "changed_fields": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Changed Fields"
+     },
+     "change_note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Change Note"
+     },
+     "changed_by": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Changed By"
+     },
+     "changed_by_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Changed By Name"
+     },
+     "changed_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Changed At"
+     },
+     "snapshot": {
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Snapshot"
+     }
+    },
+    "type": "object",
+    "required": [
+     "version",
+     "changed_fields",
+     "change_note",
+     "changed_by",
+     "changed_at",
+     "snapshot"
+    ],
+    "title": "VersionDetail"
+   },
+   "VersionOut": {
+    "properties": {
+     "version": {
+      "type": "integer",
+      "title": "Version"
+     },
+     "changed_fields": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Changed Fields"
+     },
+     "change_note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Change Note"
+     },
+     "changed_by": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Changed By"
+     },
+     "changed_by_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Changed By Name"
+     },
+     "changed_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Changed At"
+     }
+    },
+    "type": "object",
+    "required": [
+     "version",
+     "changed_fields",
+     "change_note",
+     "changed_by",
+     "changed_at"
+    ],
+    "title": "VersionOut"
    },
    "WebSourceOut": {
     "properties": {

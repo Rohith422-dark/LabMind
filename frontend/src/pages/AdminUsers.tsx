@@ -31,7 +31,7 @@ export default function AdminUsers() {
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       <div className="lg:col-span-2">
-        <h1 className="mb-4 text-2xl font-bold">Users</h1>
+        <h1 className="mb-4 text-[26px] font-semibold leading-tight">Users</h1>
         <div className="card overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-50 text-slate-600"><tr>

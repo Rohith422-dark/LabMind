@@ -41,7 +41,7 @@ export default function Login() {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-5xl flex-col justify-center px-6 py-10">
-      <h1 className="text-4xl font-bold text-brand-900">Smart Lab Assistant</h1>
+      <h1 className="text-4xl font-bold text-brand-900">LabMind</h1>
       <p className="mt-2 text-lg text-slate-600">Approved lab documents are the single source of truth. The scientist makes the final decision.</p>
 
       {demoEnabled.data?.demo_cards && (

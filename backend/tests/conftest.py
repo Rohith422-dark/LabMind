@@ -24,6 +24,9 @@ os.environ["DATABASE_URL"] = _test_url
 os.environ["DEMO_MODE"] = "0"
 os.environ["LLM_MOCK"] = "1"
 os.environ.setdefault("JWT_SECRET", "test-secret")
+import tempfile  # noqa: E402
+
+os.environ["STORAGE_DIR"] = tempfile.mkdtemp(prefix="sla-test-storage-")   # uploaded test files never touch backend/storage
 
 import pytest  # noqa: E402
 import pytest_asyncio  # noqa: E402
@@ -45,6 +48,17 @@ from scripts.db_init import init  # noqa: E402
 ROLE_USERNAMES = {r: f"t_{r}" for r in ROLES}
 
 
+@pytest.fixture(autouse=True)
+def _limiter_off(request):
+    """Every test shares one client IP, so per-IP limits would trip across unrelated tests.
+    tests/test_rate_limits.py opts back in with @pytest.mark.rate_limits."""
+    from app.limiter import limiter
+    limiter.enabled = bool(request.node.get_closest_marker("rate_limits"))
+    limiter.reset()
+    yield
+    limiter.enabled = False
+
+
 @pytest.fixture(scope="session", autouse=True)
 def _schema():
     init(_test_url)
@@ -57,7 +71,7 @@ def _clean(_schema):
     with psycopg.connect(_test_url, autocommit=True) as c:
         c.execute("TRUNCATE chunks, sop_steps, document_files, documents, knowledge_gaps, chat_history, answer_cache, "
                   "ingest_jobs, notifications, troubleshooting_sessions, reagent_requests, inventory_transactions, "
-                  "reagent_lots, reagents CASCADE")
+                  "reagent_lots, reagents, projects, conversations, memories, request_events CASCADE")
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)

@@ -119,6 +119,25 @@ async def get_document(document_id: uuid.UUID, user: User = require("knowledge.u
     return out
 
 
+@router.delete("/code/{doc_code}", status_code=204)
+async def delete_document_code(request: Request, doc_code: str, user: User = require("sop.manage"),
+                               session: AsyncSession = Depends(get_session)):
+    """Permanently delete a document with ALL its versions (files, passages, steps). Use 'retire' to keep a reference copy instead."""
+    docs = (await session.execute(select(Document).where(Document.doc_code == doc_code))).scalars().all()
+    if not docs:
+        raise HTTPException(404, "Document not found")
+    ids = [d.id for d in docs]
+    await session.execute(text("UPDATE knowledge_gaps SET linked_document_id = NULL WHERE linked_document_id = ANY(:i)"), {"i": ids})
+    await session.execute(text("UPDATE troubleshooting_sessions SET document_id = NULL WHERE document_id = ANY(:i)"), {"i": ids})
+    await session.execute(text("UPDATE ingest_jobs SET document_id = NULL, file_bytes = NULL WHERE document_id = ANY(:i)"), {"i": ids})
+    from app.services import answer_cache
+    await answer_cache.invalidate_doc(session, doc_code)
+    for d in docs:
+        await session.delete(d)
+    await audit.log(session, user, "document_deleted", doc_code, {"versions": len(docs), "title": docs[0].title}, audit.client_ip(request))
+    await session.commit()
+
+
 @router.get("/{document_id}/file")
 async def get_file(document_id: uuid.UUID, download: bool = False, user: User = require("knowledge.use"),
                    session: AsyncSession = Depends(get_session)):

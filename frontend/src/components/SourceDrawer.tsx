@@ -30,11 +30,11 @@ export function SourceDrawer({ citation, onClose }: { citation: Citation | null;
 
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-black/30" onClick={onClose} />
-      <aside className="fixed right-0 top-0 z-50 flex h-full w-full max-w-[720px] flex-col bg-white shadow-2xl" role="dialog" aria-label="Source document">
+      <div className="fixed inset-0 z-40 bg-slate-900/25" onClick={onClose} />
+      <aside className="fixed right-0 top-0 z-50 flex h-full w-full max-w-[720px] flex-col bg-white shadow-xl border-l border-slate-200" role="dialog" aria-label="Source document">
         <header className="flex items-start justify-between gap-3 border-b border-slate-200 p-4">
           <div>
-            <div className="text-lg font-bold">{citation.doc_code} <span className="text-slate-500">· {citation.title}</span></div>
+            <div className="text-lg font-semibold"><span className="code">{citation.doc_code}</span> <span className="text-slate-600">· {citation.title}</span></div>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-sm">
               {d && <span className={`badge ${d.status === "effective" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
                 {d.status === "effective" ? `Effective v${d.version}` : `${d.status.toUpperCase()} v${d.version}`}
@@ -62,7 +62,7 @@ export function SourceDrawer({ citation, onClose }: { citation: Citation | null;
               {d.text_sections.map((s, i) => {
                 const hit = s.chunk_id === citation.chunk_id;
                 return (
-                  <div key={i} ref={hit ? marked : undefined} className={hit ? "rounded-md bg-yellow-100 p-3 ring-2 ring-yellow-400" : "p-3"}>
+                  <div key={i} ref={hit ? marked : undefined} className={hit ? "rounded-lg bg-brand-100 p-3 ring-1 ring-brand-600" : "p-3"}>
                     {s.section && <div className="font-semibold">{s.section}</div>}
                     <div className="whitespace-pre-wrap">{s.text}</div>
                   </div>

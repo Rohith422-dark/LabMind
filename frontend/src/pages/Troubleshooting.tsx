@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { FileDown, Send } from "lucide-react";
+import { FileDown, FolderDown, Send } from "lucide-react";
 import { toast } from "sonner";
 import { api, streamNdjson, type Schemas } from "@/api/client";
 import type { Citation, CompareRow, DiagnoseResult, ExternalResult, SopRef, TsEvent, TsQuestion } from "@/api/types";
@@ -9,11 +9,59 @@ import { ComparisonTable } from "@/components/ComparisonTable";
 import { ExternalWarningCard } from "@/components/ExternalWarningCard";
 import { SourceDrawer } from "@/components/SourceDrawer";
 import { Banner, Spinner, errMsg } from "@/components/ui";
+import { useAuth } from "@/context/AuthContext";
 
 interface Turn { role: "user" | "system"; text: string }
+type Exp = Schemas["ExperimentOut"];
+
+/** Turn a recorded experiment into the free-text "what I did" the troubleshooter compares with the SOP. */
+function experimentToNarration(e: Exp): string {
+  const names = (xs: unknown[], f: (x: Record<string, unknown>) => string) => xs.map((x) => f(x as Record<string, unknown>)).filter(Boolean).join("; ");
+  const lines = [`Experiment ${e.identifier} - ${e.title}${e.performed_at ? ` (${new Date(e.performed_at).toLocaleDateString()})` : ""}.`];
+  if (e.objective) lines.push(`Objective: ${e.objective}`);
+  const reagents = names(e.reagents, (r) => [r.name, r.lot_no && `lot ${r.lot_no}`, r.quantity != null && `${r.quantity} ${r.unit ?? ""}`.trim()].filter(Boolean).join(" "));
+  if (reagents) lines.push(`Reagents used: ${reagents}.`);
+  const equipment = names(e.equipment, (x) => String(x.name ?? ""));
+  if (equipment) lines.push(`Equipment: ${equipment}.`);
+  const conditions = Object.entries(e.conditions ?? {}).map(([k, v]) => `${k} ${String(v)}`).join("; ");
+  if (conditions) lines.push(`Conditions: ${conditions}.`);
+  const params = names(e.parameters, (x) => `${x.name} ${x.value ?? x.text_value ?? ""}${x.unit ? ` ${x.unit}` : ""}`);
+  if (params) lines.push(`Measured values: ${params}.`);
+  if (e.observations) lines.push(`Observations: ${e.observations}`);
+  if (e.results) lines.push(`Results: ${e.results}`);
+  return lines.join("\n");
+}
+
+/** Pick one of the user's own projects and one of its experiments; the record becomes the narration (appended, never silently replacing). */
+function ImportFromProject({ onImport }: { onImport: (text: string, e: Exp) => void }) {
+  const [projectId, setProjectId] = useState("");
+  const [expId, setExpId] = useState("");
+  const projects = useQuery({ queryKey: ["ts-projects"], queryFn: () => api<Schemas["ProjectOut"][]>("/projects") });
+  const exps = useQuery({ queryKey: ["ts-exps", projectId], enabled: !!projectId,
+    queryFn: () => api<Schemas["ExperimentPage"]>(`/projects/${projectId}/experiments?limit=100&sort=performed_at&order=desc`) });
+  const chosen = exps.data?.items.find((x) => x.id === expId);
+  if (projects.data?.length === 0) return null;
+  return (
+    <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3" data-testid="ts-import">
+      <div className="flex items-center gap-2 text-sm font-medium text-slate-800"><FolderDown size={16} className="text-brand-600" />Import what you did from a project experiment</div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <select aria-label="Project" className="input" value={projectId} onChange={(e) => { setProjectId(e.target.value); setExpId(""); }}>
+          <option value="">Choose a project…</option>{projects.data?.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select>
+        <select aria-label="Experiment" className="input" value={expId} disabled={!projectId || exps.isLoading} onChange={(e) => setExpId(e.target.value)}>
+          <option value="">{exps.isLoading ? "Loading…" : exps.data?.items.length === 0 ? "No experiments in this project" : "Choose an experiment…"}</option>
+          {exps.data?.items.map((x) => <option key={x.id} value={x.id}>{x.identifier} · {x.title}{x.outcome !== "unknown" ? ` (${x.outcome})` : ""}</option>)}</select>
+      </div>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs text-slate-600">The record&apos;s text is added to the box below so you can edit it. It is handled like anything you type here.</p>
+        <button type="button" className="btn-secondary shrink-0" disabled={!chosen} onClick={() => chosen && onImport(experimentToNarration(chosen), chosen)}>Import</button>
+      </div>
+    </div>
+  );
+}
 
 export default function Troubleshooting() {
   const [params] = useSearchParams();
+  const { can } = useAuth();
   const sops = useQuery({ queryKey: ["sops-ts"], queryFn: () => api<Schemas["DocumentOut"][]>("/documents?status=effective&type=SOP") });
   const [docId, setDocId] = useState("");
   const [symptom, setSymptom] = useState(params.get("symptom") ?? "");
@@ -110,8 +158,15 @@ export default function Troubleshooting() {
                   <option value="">Auto-detect from the symptom</option>
                   {sops.data?.map((d) => <option key={d.id} value={d.id}>{d.doc_code} v{d.version} — {d.title}</option>)}</select></div>
               <div><label className="label">Symptom</label><input className="input" value={symptom} onChange={(e) => setSymptom(e.target.value)} placeholder="What went wrong?" /></div>
+              {can("projects.use") && <ImportFromProject onImport={(text, e) => {
+                setNarration((cur) => (cur.trim() ? `${cur.trim()}
+
+${text}` : text));
+                setSymptom((cur) => cur.trim() || (e.outcome === "failure" ? `${e.identifier} did not give the expected result` : cur));
+                toast.success(`Imported ${e.identifier}. Review and edit it before comparing.`);
+              }} />}
               <div><label className="label">What did you do? (free text, in order)</label>
-                <textarea className="input" rows={7} value={narration} onChange={(e) => setNarration(e.target.value)} /></div>
+                <textarea className="input" rows={7} value={narration} onChange={(e) => setNarration(e.target.value)} placeholder="Describe each step you carried out, in order, with the values you used." /></div>
               <button className="btn-primary" disabled={busy || symptom.trim().length < 3 || narration.trim().length < 3} onClick={start}>Compare with the SOP</button>
             </div>
           )}

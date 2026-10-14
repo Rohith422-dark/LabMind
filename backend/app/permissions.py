@@ -16,7 +16,8 @@ PERMISSIONS: dict[str, tuple[str, ...]] = {
     "sop.manage": (SEN,),            # upload/publish/retire
     "gaps.view": (SEN,),
     "gaps.link": (SEN,),
-    "audit.view": (SEN, ADM),
+    "projects.use": ROLES,           # any authenticated user; real access is per-project membership (services/access.py)
+    "audit.view": (ADM,),
     "users.manage": (ADM,),
 }
 

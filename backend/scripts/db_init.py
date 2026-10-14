@@ -54,7 +54,13 @@ def init(url: str, reset: bool = False) -> None:
     Base.metadata.create_all(eng)
     eng.dispose()
     with psycopg.connect(url, autocommit=True) as c:
+        # idempotent in-place migrations for databases created before a column existed (keeps data)
+        c.execute("ALTER TABLE chat_history ADD COLUMN IF NOT EXISTS conversation_id uuid")
+        c.execute("ALTER TABLE chat_history ADD COLUMN IF NOT EXISTS meta jsonb NOT NULL DEFAULT '{}'::jsonb")
+        c.execute("CREATE INDEX IF NOT EXISTS ix_chat_history_conversation_id ON chat_history (conversation_id)")
         c.execute(TRIGGER_SQL)
+    from scripts.migrate import apply as apply_migrations
+    apply_migrations(url)
     print(f"schema ready: {db_name(url)}")
 
 

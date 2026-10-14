@@ -175,6 +175,7 @@ async def prewarm(users: dict[str, User]) -> None:
         print(f"  pre-warmed: {q['question'][:70]}  ({n_tokens} tokens)")
     async with session_maker()() as s:  # the demo starts with an empty chat history (cache + audit remain)
         await s.execute(text("DELETE FROM chat_history"))
+        await s.execute(text("DELETE FROM conversations WHERE project_id IS NULL"))
         await s.execute(text("DELETE FROM knowledge_gaps"))
         await s.commit()
 

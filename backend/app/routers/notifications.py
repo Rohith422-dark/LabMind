@@ -15,6 +15,7 @@ router = APIRouter(prefix="/notifications", tags=["notifications"])
 
 class NotificationOut(BaseModel):
     id: uuid.UUID
+    kind: str | None = None
     message: str
     link: str | None
     is_read: bool

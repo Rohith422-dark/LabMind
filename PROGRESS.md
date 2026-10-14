@@ -1,5 +1,19 @@
 # PROGRESS
 
+## 2026-10-13 - projects, grounded project assistant, request workflow (this release)
+- Added: private projects (owner/editor/viewer, password-gated access requests), experimental records with immutable history, project documents
+  (PDF/DOCX/TXT/MD/CSV), project-scoped corrective RAG with evidence validation and explicit external-search consent, persistent conversations
+  (rename/delete) and three-level memory, per-reagent availability (physical/usable/reserved/expired), reservations, the six-state request lifecycle with
+  audit/notifications, versioned stock edits. Migration `backend/migrations/001_*.sql`; docs in README.
+- Verified: 93 backend tests pass (51 pre-existing + 42 new; mock model); frontend type-check + production build pass; manual browser walk-through against the real
+  backend with a real Gemini key (create project, record experiment, grounded answer with citation, consent deny and allow-once, request an expired reagent, lab assistant
+  approval, requester timeline, phone-width layout).
+- Found by that live run and fixed: the lexical-support check rejected correct claims that echoed the document title (now counts the cited source name);
+  experiment-form textareas lost focus on every keystroke; the app shell was unusable at phone width.
+- Not verified: real-model behaviour beyond a handful of questions (no quality benchmark); label-photo extraction; Gemini web grounding (not available on the key);
+  browser file-picker uploads (uploads were exercised through the same API call); frontend automated tests (none exist in this repo).
+
+
 ## Done (all verified by automated tests and by running the production build in a browser)
 - **Platform**: schema (HNSW, GIN tsvector, one-effective-version partial unique index, DB-enforced append-only triggers),
   4-role RBAC (`permissions.py` + `require()`), JWT/argon2, hash-chained audit with `Verify integrity`, rate limits,

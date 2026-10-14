@@ -6,7 +6,7 @@ export type Citation = {
 };
 
 export type ChatEvent =
-  | { type: "meta"; chat_id: string; intent: string }
+  | { type: "meta"; chat_id: string; intent: string; conversation_id: string }
   | { type: "token"; text: string }
   | { type: "citations"; citations: Citation[] }
   | { type: "safety"; note: string }
@@ -54,3 +54,22 @@ export type DemoQuestion = {
   role: string; question: string; kind: "answerable" | "not_covered" | "troubleshoot_narration";
   expected_doc_code?: string; expected_page?: number; symptom?: string;
 };
+
+export type ProjectCitation = {
+  n: number; source_type: "document" | "experiment" | "analysis"; source_id: string; source_version: number;
+  label: string; page: number | null; section: string | null; snippet: string; score: number;
+};
+export type Conflict = { quantity: string; unit: string; statements: { value: number; n: number; source: string; page: number | null }[] };
+export type ExternalOption = { value: "allow_once" | "allow_conversation" | "deny"; label: string };
+export type WebSource = { title: string; uri: string; domain: string };
+export type ProjectChatEvent =
+  | { type: "meta"; chat_id: string; conversation_id: string; project_id: string }
+  | { type: "status"; stage: string }
+  | { type: "token"; text: string }
+  | { type: "citations"; citations: ProjectCitation[] }
+  | { type: "answer"; verdict: "sufficient" | "partial" | "insufficient"; conflicts: Conflict[]; external: boolean }
+  | { type: "need_external"; chat_id: string; message: string; options: ExternalOption[] }
+  | { type: "external"; chat_id: string; answer: string; sources: WebSource[]; grounded: boolean }
+  | { type: "external_error"; message: string }
+  | { type: "done" }
+  | { type: "error"; message: string };

@@ -20,10 +20,14 @@ class Settings(BaseSettings):
     llm_rpm: int = 10
     enable_search_grounding: bool = True
     demo_mode: bool = False
-    demo_cards: bool = True   # one-click login cards; always on when DEMO_MODE=1
+    demo_cards: bool = False  # password-less one-click login cards; OFF by default, always on when DEMO_MODE=1
     llm_mock: bool = False
     user_passwords: str = ""
     port: int = 8010
+    storage_dir: str = "storage"            # uploaded project documents live here (outside the database, outside the web root)
+    project_max_upload_mb: int = 10
+    project_min_score: float | None = None  # cosine gate for project retrieval; falls back to VECTOR_MIN_SCORE
+    cors_origins: str = ""                  # extra comma-separated allowed origins
 
     @property
     def async_url(self) -> str:
@@ -32,6 +36,10 @@ class Settings(BaseSettings):
     @property
     def sync_url(self) -> str:
         return self.database_url
+
+    @property
+    def project_score_gate(self) -> float:
+        return self.project_min_score if self.project_min_score is not None else self.vector_min_score
 
     def password_for(self, username: str) -> str | None:
         for pair in self.user_passwords.split(","):

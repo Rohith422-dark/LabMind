@@ -50,7 +50,7 @@ function Percent() {
 
 export default function Calculators() {
   return (
-    <div className="space-y-4"><h1 className="text-2xl font-bold">Calculators</h1>
+    <div className="space-y-4"><h1 className="text-[26px] font-semibold leading-tight">Calculators</h1>
       <p className="text-sm text-slate-600">Quick arithmetic helpers. Always double-check against your approved method before use.</p>
       <div className="grid gap-4 lg:grid-cols-3"><Dilution /><Molarity /><Percent /></div></div>
   );

@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import psycopg
 
 from app.config import db_name, get_settings
-from scripts._snap import ORDER, SNAP_DIR, columns
+from scripts._snap import ORDER, SNAP_DIR, restore_columns
 
 
 def main() -> int:
@@ -25,7 +25,7 @@ def main() -> int:
     with psycopg.connect(s.database_url) as conn:
         conn.execute("TRUNCATE " + ", ".join(f'"{t}"' for t in ORDER) + " CASCADE")
         for t in ORDER:
-            cols = ", ".join(f'"{c}"' for c in columns(conn, t))
+            cols = ", ".join(f'"{c}"' for c in restore_columns(conn, t))
             with conn.cursor().copy(f'COPY "{t}" ({cols}) FROM STDIN') as cp:
                 with open(SNAP_DIR / f"{t}.copy", "rb") as f:
                     while chunk := f.read(1 << 20):

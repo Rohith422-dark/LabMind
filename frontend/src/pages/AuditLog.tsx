@@ -21,7 +21,7 @@ export default function AuditLog() {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">Audit log</h1>
+        <h1 className="text-[26px] font-semibold leading-tight">Audit log</h1>
         <div className="flex items-center gap-2">
           <input className="input w-56" placeholder="Filter by action" value={action} onChange={(e) => setAction(e.target.value)} />
           <button className="btn-secondary" onClick={exportCsv}>Export CSV</button>

@@ -11,7 +11,7 @@ type Doc = Schemas["DocumentOut"];
 interface Step { step_no: number; action: string; parameters: Record<string, unknown>; is_critical: boolean; source_page: number | null; reviewed?: boolean }
 const STAGES: Record<string, string> = { queued: "Queued", parsing: "Parsing pages", extracting: "Extracting metadata and steps", embedding: "Embedding passages", ready: "Ready to review" };
 
-export default function SopManagement() {
+export default function SopManagement({ embedded = false, forceCode, onClose }: { embedded?: boolean; forceCode?: string; onClose?: () => void }) {
   const qc = useQueryClient();
   const [params] = useSearchParams();
   const gapId = params.get("gap") ?? undefined;
@@ -31,10 +31,11 @@ export default function SopManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">SOP management</h1>
+      {!embedded && <div className="flex items-center justify-between">
+        <h1 className="text-[26px] font-semibold leading-tight">SOP management</h1>
         <Link to="/gaps" className="text-sm text-brand-700 underline">Knowledge gaps →</Link>
-      </div>
+      </div>}
+      {forceCode && <Banner tone="blue">Uploading a new version of <b>&nbsp;{forceCode}</b>. The current version stays available as history and is superseded once you publish.</Banner>}
       <Banner tone="blue">This demo uses a free AI tier. Do not upload confidential or proprietary data.</Banner>
       {gapQ && <Banner tone="amber">Publishing from a knowledge gap. Question: <b>&nbsp;{gapQ.question}</b></Banner>}
       {!jobId && !published && (
@@ -44,17 +45,17 @@ export default function SopManagement() {
           <input type="file" accept=".pdf,.docx" className="hidden" onChange={onFile} />
         </label>
       )}
-      {jobId && !published && <Wizard jobId={jobId} gapId={gapId} onCancel={() => setJobId(null)}
+      {jobId && !published && <Wizard jobId={jobId} gapId={gapId} forceCode={forceCode} onCancel={() => setJobId(null)}
         onPublished={(d) => { setPublished(d); setJobId(null); void qc.invalidateQueries(); }} />}
       {published && (
         <div className="card flex items-center justify-between gap-3 p-5">
           <div className="flex items-center gap-3"><CheckCircle2 className="text-green-600" />
             <div><b>{published.doc_code} v{published.version}</b> is now effective{published.version > 1 ? "; the previous version was superseded." : "."}</div></div>
           <div className="flex gap-2"><Link className="btn-secondary" to={`/sops/${published.id}`}>View</Link>
-            <button className="btn-primary" onClick={() => setPublished(null)}>Upload another</button></div>
+            <button className="btn-primary" onClick={() => { setPublished(null); onClose?.(); }}>{onClose ? "Done" : "Upload another"}</button></div>
         </div>
       )}
-      <div>
+      {!embedded && <div>
         <h2 className="mb-2 font-semibold">All documents</h2>
         {docs.isLoading && <Spinner />}
         <div className="card overflow-x-auto"><table className="w-full text-left text-sm">
@@ -63,12 +64,12 @@ export default function SopManagement() {
             <tr key={d.id} className="border-t border-slate-100"><td className="px-3 py-2"><Link className="text-brand-700 underline" to={`/sops/${d.id}`}>{d.doc_code}</Link></td>
               <td className="px-3 py-2">{d.title}</td><td className="px-3 py-2">v{d.version}</td><td className="px-3 py-2"><StatusBadge status={d.status} /></td>
               <td className="px-3 py-2 text-slate-500">{d.change_note}</td></tr>))}</tbody></table></div>
-      </div>
+      </div>}
     </div>
   );
 }
 
-function Wizard({ jobId, gapId, onCancel, onPublished }: { jobId: string; gapId?: string; onCancel: () => void; onPublished: (d: Doc) => void }) {
+function Wizard({ jobId, gapId, forceCode, onCancel, onPublished }: { jobId: string; gapId?: string; forceCode?: string; onCancel: () => void; onPublished: (d: Doc) => void }) {
   const [job, setJob] = useState<Job | null>(null);
   const [meta, setMeta] = useState({ doc_code: "", title: "", doc_type: "SOP", department: "", equipment: "", change_note: "" });
   const [steps, setSteps] = useState<Step[]>([]);
@@ -90,7 +91,7 @@ function Wizard({ jobId, gapId, onCancel, onPublished }: { jobId: string; gapId?
   useEffect(() => {
     if (job?.status === "ready" && job.preview && !filled) {
       const m = job.preview.metadata as Record<string, string>;
-      setMeta({ doc_code: m.doc_code ?? "", title: m.title ?? "", doc_type: m.doc_type ?? "SOP", department: m.department ?? "", equipment: m.equipment ?? "", change_note: "" });
+      setMeta({ doc_code: forceCode ?? m.doc_code ?? "", title: m.title ?? "", doc_type: m.doc_type ?? "SOP", department: m.department ?? "", equipment: m.equipment ?? "", change_note: "" });
       setSteps((job.preview.steps as Step[]) ?? []); setFilled(true);
     }
   }, [job, filled]);
@@ -125,7 +126,7 @@ function Wizard({ jobId, gapId, onCancel, onPublished }: { jobId: string; gapId?
       {warnings.map((w) => <Banner key={w} tone="amber">{w}</Banner>)}
       {ocr.length > 0 && <Banner tone="blue">Pages transcribed by AI (OCR): {ocr.join(", ")}. Please proofread.</Banner>}
       <div className="card grid gap-3 p-4 md:grid-cols-2">
-        <div><label className="label">Document code</label><input className="input" value={meta.doc_code} onChange={setM("doc_code")} /></div>
+        <div><label className="label">Document code</label><input className="input" value={meta.doc_code} disabled={!!forceCode} onChange={setM("doc_code")} /></div>
         <div><label className="label">Title</label><input className="input" value={meta.title} onChange={setM("title")} /></div>
         <div><label className="label">Type</label><select className="input" value={meta.doc_type} onChange={setM("doc_type")}>
           {["SOP", "protocol", "troubleshooting_guide", "manual"].map((t) => <option key={t}>{t}</option>)}</select></div>

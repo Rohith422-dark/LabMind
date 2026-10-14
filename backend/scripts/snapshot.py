@@ -13,12 +13,14 @@ from scripts._snap import ORDER, SNAP_DIR, columns
 def main() -> None:
     s = get_settings()
     SNAP_DIR.mkdir(parents=True, exist_ok=True)
-    for f in SNAP_DIR.glob("*.copy"):
+    for f in [*SNAP_DIR.glob("*.copy"), *SNAP_DIR.glob("*.cols")]:
         f.unlink()
     with psycopg.connect(s.database_url) as conn:
         total = 0
         for t in ORDER:
-            cols = ", ".join(f'"{c}"' for c in columns(conn, t))
+            names = columns(conn, t)
+            cols = ", ".join(f'"{c}"' for c in names)
+            (SNAP_DIR / f"{t}.cols").write_text(",".join(names), encoding="utf-8")   # lets restore survive later schema changes
             n = conn.execute(f'SELECT count(*) FROM "{t}"').fetchone()[0]
             with open(SNAP_DIR / f"{t}.copy", "wb") as out, conn.cursor().copy(f'COPY "{t}" ({cols}) TO STDOUT') as cp:
                 for block in cp:

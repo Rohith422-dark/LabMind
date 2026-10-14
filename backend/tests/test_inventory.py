@@ -24,7 +24,7 @@ async def test_ten_concurrent_issues_exactly_three_succeed(client, tokens):
     sci, ana = tokens["scientist"], tokens["lab_analyst"]
     ids = []
     for _ in range(10):
-        r = await client.post("/api/requests", headers=auth(sci), json={"reagent_id": str(rid), "quantity": 1})
+        r = await client.post("/api/requests", headers=auth(sci), json={"reagent_id": str(rid), "quantity": 1, "reason": "unit test"})
         assert r.status_code == 201
         ids.append(r.json()["id"])
     res = await asyncio.gather(*[client.post(f"/api/requests/{i}/issue", headers=auth(ana), json={"lot_id": str(lid)})
@@ -41,7 +41,7 @@ async def test_ten_concurrent_issues_exactly_three_succeed(client, tokens):
 async def test_expired_lot_blocked_and_scientist_forbidden(client, tokens):
     rid, lid = await seed(50, date.today() - timedelta(days=1))
     sci, ana = tokens["scientist"], tokens["lab_analyst"]
-    req = (await client.post("/api/requests", headers=auth(sci), json={"reagent_id": str(rid), "quantity": 1})).json()
+    req = (await client.post("/api/requests", headers=auth(sci), json={"reagent_id": str(rid), "quantity": 1, "reason": "unit test"})).json()
     r = await client.post(f"/api/requests/{req['id']}/issue", headers=auth(ana), json={"lot_id": str(lid)})
     assert r.status_code == 409 and "expired" in r.text.lower()
     # nothing written

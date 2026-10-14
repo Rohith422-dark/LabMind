@@ -6,8 +6,8 @@ export function ExternalWarningCard({ res, onFeedback, onRequestSop, requested }
   res: ExternalResult; onFeedback: (f: "up" | "down") => void; onRequestSop: () => void; requested: boolean;
 }) {
   return (
-    <div className="rounded-lg border-2 border-amber-400 bg-amber-50" data-testid="external-card">
-      <div className="flex items-center gap-2 rounded-t-md bg-amber-400 px-4 py-2 text-sm font-bold uppercase tracking-wide text-amber-950">
+    <div className="rounded-xl border border-external-border bg-external-surface" data-testid="external-card">
+      <div className="flex items-center gap-2 border-b border-external-border/40 px-4 py-2.5 text-sm font-semibold text-amber-800">
         <AlertTriangle size={18} /> External AI result — not from approved lab documents
       </div>
       <div className="space-y-3 p-4">
@@ -23,7 +23,7 @@ export function ExternalWarningCard({ res, onFeedback, onRequestSop, requested }
             </ul>
           </div>
         ) : <div className="text-xs text-amber-900">No web sources available for this answer.</div>}
-        <p className="border-t border-amber-300 pt-3 text-sm font-medium text-amber-950">
+        <p className="border-t border-external-border/40 pt-3 text-sm font-medium text-slate-800">
           This information may be inaccurate or outdated. It is not an approved SOP. Verify with a Senior Analyst or an official source before using it in any experiment.
         </p>
         <div className="flex flex-wrap gap-2">

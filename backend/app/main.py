@@ -20,15 +20,16 @@ MAX_BODY = 12 * 1024 * 1024  # uploads capped at 10 MB + multipart overhead
 
 def create_app() -> FastAPI:
     settings = get_settings()  # raises if LLM_MOCK=1 with DEMO_MODE=1
-    app = FastAPI(title="Smart Lab Assistant", version="0.1.0")
+    app = FastAPI(title="LabMind", version="0.1.0")
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:5173", "http://127.0.0.1:5173",
-                       f"http://localhost:{settings.port}", f"http://127.0.0.1:{settings.port}"],
-        allow_methods=["*"], allow_headers=["*"],
+                       f"http://localhost:{settings.port}", f"http://127.0.0.1:{settings.port}",
+                       *[o.strip() for o in settings.cors_origins.split(",") if o.strip()]],
+        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], allow_headers=["Authorization", "Content-Type"],
     )
 
     @app.middleware("http")
