@@ -54,6 +54,21 @@ stateDiagram-v2
     rejected --> [*]
 ```
 
+## Screenshots
+
+| | |
+|---|---|
+| **AI assistant** - answers with citations and the retrieved context panel | **Inventory** - physical, usable, reserved and expired stock per reagent |
+| ![AI assistant](docs/screenshots/chat-assistant.png) | ![Inventory](docs/screenshots/inventory.png) |
+| **SOP library** | **Troubleshooting** - rule-based SOP comparison |
+| ![SOP library](docs/screenshots/sop-library.png) | ![Troubleshooting](docs/screenshots/troubleshooting.png) |
+| **Research projects** | **My requests** - reagent request workflow |
+| ![Research projects](docs/screenshots/research-projects.png) | ![My requests](docs/screenshots/my-requests.png) |
+| **Lab console** - analyst view of requests and stock | **Audit log** - tamper-evident trail |
+| ![Lab console](docs/screenshots/analyst-console.png) | ![Audit log](docs/screenshots/audit-log.png) |
+
+Screenshots use the synthetic demo data from `npm run seed`.
+
 ## Prerequisites
 Python 3.12 via [`uv`](https://docs.astral.sh/uv/) (uv fetches 3.12 itself), Node 20+, Docker Desktop (or any Postgres with
 pgvector, then only `DATABASE_URL` changes), a free Gemini API key from https://aistudio.google.com/apikey.
