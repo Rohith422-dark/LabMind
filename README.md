@@ -12,6 +12,48 @@ assistants - see [Research projects](#research-projects-evidence-grounded-assist
 
 Stack: Python 3.12 + FastAPI · PostgreSQL 17 + pgvector · React + Vite + TypeScript + Tailwind · Gemini (free tier).
 
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-backend-009688?logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-Vite%20%2B%20TS-61DAFB?logo=react&logoColor=black)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17%20%2B%20pgvector-4169E1?logo=postgresql&logoColor=white)
+![Gemini](https://img.shields.io/badge/LLM-Gemini-8E75B2?logo=googlegemini&logoColor=white)
+
+## Architecture
+
+```mermaid
+flowchart LR
+    U["Scientist / Analyst / Lab assistant<br/>(browser)"] --> FE["React SPA<br/>Vite + TypeScript + Tailwind"]
+    FE -->|"REST, JWT"| API["FastAPI backend<br/>RBAC · audit chain · rate limits"]
+    API --> RAG["Evidence-grounded RAG<br/>retrieve → cite → answer"]
+    RAG --> DB[("PostgreSQL 17<br/>+ pgvector")]
+    API --> DB
+    RAG -->|"embeddings + answers"| G["Gemini API"]
+    RAG -.->|"only with consent"| WEB["Online fallback<br/>(clearly marked external)"]
+```
+
+## Reagent request workflow
+
+Approving a request never touches stock. Only fulfilment moves inventory.
+
+```mermaid
+stateDiagram-v2
+    [*] --> submitted
+    submitted --> under_review
+    submitted --> needs_clarification
+    submitted --> approved
+    submitted --> rejected
+    under_review --> needs_clarification
+    under_review --> approved
+    under_review --> rejected
+    needs_clarification --> under_review: requester answers
+    needs_clarification --> approved
+    needs_clarification --> rejected
+    approved --> fulfilled: stock issued / need met
+    approved --> rejected
+    fulfilled --> [*]
+    rejected --> [*]
+```
+
 ## Prerequisites
 Python 3.12 via [`uv`](https://docs.astral.sh/uv/) (uv fetches 3.12 itself), Node 20+, Docker Desktop (or any Postgres with
 pgvector, then only `DATABASE_URL` changes), a free Gemini API key from https://aistudio.google.com/apikey.
