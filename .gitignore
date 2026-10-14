@@ -17,3 +17,7 @@ backend/storage/
 # local database dumps contain user password hashes - never commit
 backup-*.sql
 *.dump
+
+# local notes - not part of the repo
+DEMO.md
+PROGRESS.md
