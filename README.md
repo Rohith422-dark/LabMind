@@ -31,6 +31,10 @@ flowchart LR
     RAG -.->|"only with consent"| WEB["Online fallback<br/>(clearly marked external)"]
 ```
 
+### Self-RAG answer flow
+
+![Self-RAG flow diagram](docs/images/self-rag-flow.webp)
+
 ## Reagent request workflow
 
 Approving a request never touches stock. Only fulfilment moves inventory.
